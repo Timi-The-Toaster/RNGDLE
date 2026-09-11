@@ -46,28 +46,41 @@
         .timer-text { font-size: 0.95rem; color: var(--subtext); }
 
         /* Achievements Display Area */
-        .achievements-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .achievements-container { width: 100%; max-width: 550px; display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
         .achievement-card { 
-            background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 20px; 
+            background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; padding: 15px 20px; 
             display: flex; justify-content: space-between; align-items: center; 
             animation: slideIn 0.5s ease forwards; opacity: 0; transform: translateY(10px);
         }
-        .ach-info { display: flex; flex-direction: column; align-items: flex-start; }
-        .ach-name { font-weight: bold; font-size: 1.1rem; color: #fff; }
-        .ach-score { font-size: 0.85rem; color: var(--gold); }
-        .ach-num-display { font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: bold; letter-spacing: 4px; background: #000; padding: 5px 15px; border-radius: 6px; }
+        .ach-info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+        
+        .ach-header { display: flex; align-items: center; gap: 10px; }
+        .ach-name { font-weight: bold; font-size: 1.15rem; color: #fff; }
+        .ach-desc { font-size: 0.85rem; color: var(--subtext); font-style: italic; }
+        .ach-score { font-size: 0.9rem; font-weight: bold; color: var(--gold); margin-top: 4px; }
+        
+        .ach-num-display { font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: bold; letter-spacing: 4px; background: #000; padding: 8px 15px; border-radius: 6px; }
+
+        /* Tier Badges */
+        .tier-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .badge-common { background: rgba(148,163,184,0.2); color: #cbd5e1; border: 1px solid #64748b; }
+        .badge-uncommon { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #16a34a; }
+        .badge-rare { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #2563eb; }
+        .badge-epic { background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid #9333ea; }
+        .badge-legendary { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid #d97706; }
+        .badge-mythic { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #dc2626; box-shadow: 0 0 10px rgba(239,68,68,0.4); }
 
         /* Final Rarity Banner */
-        .final-banner { margin-top: 20px; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 15px; border-radius: 8px; width: 100%; }
-        .tier-common { color: #94a3b8; text-shadow: 0 0 10px rgba(148,163,184,0.5); }
-        .tier-rare { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
-        .tier-epic { color: #a855f7; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
-        .tier-legendary { color: var(--gold); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
-        .tier-mythic { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        .final-banner { margin-top: 20px; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 15px; border-radius: 8px; width: 100%; text-align: center; }
+        .tier-text-common { color: #94a3b8; text-shadow: 0 0 10px rgba(148,163,184,0.5); }
+        .tier-text-rare { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        .tier-text-epic { color: #a855f7; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
+        .tier-text-legendary { color: var(--gold); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+        .tier-text-mythic { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
 
         @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* Upgrade Tree Structure (Compact) */
+        /* Upgrade Tree Structure */
         .tree-section { background: var(--card-bg); border-radius: 16px; padding: 30px 20px; border: 1px solid var(--card-border); position: relative; }
         .section-title { font-size: 1.4rem; color: #fff; text-align: center; margin-bottom: 25px; }
         .tree-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 20px 0; width: 100%; }
@@ -106,7 +119,7 @@
         <button class="roll-btn" id="btn-roll" onclick="startRollSequence()">Roll</button>
         <div class="timer-text" id="cooldown-display">Ready to roll!</div>
 
-        <!-- Achievements will dynamically spawn here during a roll -->
+        <!-- Achievements spawn here dynamically -->
         <div class="achievements-container" id="achievements-container"></div>
         <div class="final-banner" id="final-banner"></div>
     </div>
@@ -133,86 +146,93 @@
 
 <script>
     /* =====================================================================
-       1. GAME STATE & SETTINGS
+       1. GAME STATE
        ===================================================================== */
     let GAME = {
-        pts: 0,
-        rolls: 0,
-        best: 0,
-        upgrades: [],
-        cooldownReady: 0,
-        isRolling: false,
+        pts: 0, rolls: 0, best: 0, upgrades: [], cooldownReady: 0, isRolling: false,
     };
 
     let baseCooldown = 8000; 
-    let rollInterval = null;
 
-    // Load from local storage
     if (localStorage.getItem('rngdleAchieveSave')) {
         let saved = JSON.parse(localStorage.getItem('rngdleAchieveSave'));
         GAME = { ...GAME, ...saved };
     }
 
     /* =====================================================================
-       2. ACHIEVEMENT DEFINITIONS & LOGIC
+       2. ACHIEVEMENT DEFINITIONS (Balanced Mathematically)
        ===================================================================== */
     
-    // Helper to highlight specific indexes in a string
     function highlightIndices(str, indicesArr) {
-        return str.split('').map((char, i) => 
-            indicesArr.includes(i) ? `<span class="hl">${char}</span>` : char
-        ).join('');
+        return str.split('').map((char, i) => indicesArr.includes(i) ? `<span class="hl">${char}</span>` : char).join('');
     }
-
-    // Helper to return all indices 0 to length-1
     function allIndices(len) { return Array.from({length: len}, (_, i) => i); }
+
+    // Balanced Scoring Tiers:
+    // Common: 10 - 50 pts
+    // Uncommon: 100 - 300 pts
+    // Rare: 800 - 1500 pts
+    // Epic: 4000 - 8000 pts
+    // Legendary: 20000 - 50000 pts
+    // Mythic: 150000+ pts
 
     const ACHIEVEMENTS = [
         {
-            id: 'length7', name: '7 Digit Number', score: 7777777,
+            id: 'length7', name: '7 Digit Number', score: 150000, tier: 'mythic',
+            desc: "A colossal anomaly of length. (0.2% Base Chance)",
             check: (s) => s.length === 7, getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'length6', name: '6 Digit Number', score: 66,
+            id: 'length6', name: '6 Digit Number', score: 15, tier: 'common',
+            desc: "The standard length for a roll. (50% Base Chance)",
             check: (s) => s.length === 6, getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'length5', name: '5 Digit Number', score: 55555,
+            id: 'length5', name: '5 Digit Number', score: 100, tier: 'uncommon',
+            desc: "Slightly truncated. (25% Base Chance)",
             check: (s) => s.length === 5, getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'length4', name: '4 Digit Number', score: 4444,
+            id: 'length4', name: '4 Digit Number', score: 250, tier: 'uncommon',
+            desc: "Four perfect digits. (15% Base Chance)",
             check: (s) => s.length === 4, getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'length3', name: '3 Digit Number', score: 333,
+            id: 'length3', name: '3 Digit Number', score: 1000, tier: 'rare',
+            desc: "A compact trio. (7% Base Chance)",
             check: (s) => s.length === 3, getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'length2', name: '2 Digit Number', score: 22,
+            id: 'length2', name: '2 Digit Number', score: 5000, tier: 'epic',
+            desc: "A tiny two-digit pair. (2% Base Chance)",
             check: (s) => s.length === 2, getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'length1', name: '1 Digit Number', score: 1,
+            id: 'length1', name: '1 Digit Number', score: 25000, tier: 'legendary',
+            desc: "The purest form of a number. (0.8% Base Chance)",
             check: (s) => s.length === 1, getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'even', name: 'Even Number', score: 2,
+            id: 'even', name: 'Even Number', score: 10, tier: 'common',
+            desc: "Ends in 0, 2, 4, 6, or 8.",
             check: (s) => parseInt(s[s.length-1]) % 2 === 0, 
             getHtml: (s) => highlightIndices(s, [s.length-1])
         },
         {
-            id: 'odd', name: 'Odd Number', score: 1,
+            id: 'odd', name: 'Odd Number', score: 10, tier: 'common',
+            desc: "Ends in 1, 3, 5, 7, or 9.",
             check: (s) => parseInt(s[s.length-1]) % 2 !== 0, 
             getHtml: (s) => highlightIndices(s, [s.length-1])
         },
         {
-            id: 'void', name: 'Void', score: 404,
+            id: 'void', name: 'Void', score: 20, tier: 'common',
+            desc: "The number contains absolutely no zeros.",
             check: (s) => !s.includes('0'), 
             getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'neighbours', name: 'Neighbours', score: 12,
+            id: 'neighbours', name: 'Neighbours', score: 25, tier: 'common',
+            desc: "Contains two adjacent digits next to each other in value.",
             check: (s) => s.length >= 2 && s.split('').some((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1),
             getHtml: (s) => {
                 let idx = s.split('').findIndex((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1);
@@ -220,7 +240,8 @@
             }
         },
         {
-            id: 'consecDoublePair', name: 'Consecutive Double Pair', score: 1122,
+            id: 'consecDoublePair', name: 'Consecutive Double Pair', score: 1200, tier: 'rare',
+            desc: "Two distinct pairs stacked right beside each other.",
             check: (s) => /(.)\1(?!\1)(.)\2/.test(s),
             getHtml: (s) => {
                 let match = s.match(/(.)\1(?!\1)(.)\2/);
@@ -228,7 +249,8 @@
             }
         },
         {
-            id: 'doublePair', name: 'Double Pair', score: 2222,
+            id: 'doublePair', name: 'Double Pair', score: 200, tier: 'uncommon',
+            desc: "Contains two sets of pairs scattered within the number.",
             check: (s) => {
                 let counts = {};
                 for(let c of s) counts[c] = (counts[c]||0)+1;
@@ -244,7 +266,8 @@
             }
         },
         {
-            id: 'consecPair', name: 'Consecutive Pair', score: 11,
+            id: 'consecPair', name: 'Consecutive Pair', score: 30, tier: 'common',
+            desc: "Two identical digits right next to each other.",
             check: (s) => /(.)\1/.test(s),
             getHtml: (s) => {
                 let match = s.match(/(.)\1/);
@@ -252,7 +275,8 @@
             }
         },
         {
-            id: 'pair', name: 'Pair', score: 22,
+            id: 'pair', name: 'Pair', score: 15, tier: 'common',
+            desc: "Contains two of the exact same digit.",
             check: (s) => new Set(s).size < s.length,
             getHtml: (s) => {
                 let counts = {};
@@ -264,7 +288,8 @@
             }
         },
         {
-            id: 'luckySevens', name: 'Lucky Sevens', score: 777,
+            id: 'luckySevens', name: 'Lucky Sevens', score: 800, tier: 'rare',
+            desc: "Hit a consecutive pair of 7s.",
             check: (s) => s.includes('77'),
             getHtml: (s) => {
                 let idx = s.indexOf('77');
@@ -272,7 +297,8 @@
             }
         },
         {
-            id: 'sevens', name: "7's", score: 77,
+            id: 'sevens', name: "7's", score: 150, tier: 'uncommon',
+            desc: "Contains a pair of 7s anywhere in the string.",
             check: (s) => (s.match(/7/g) || []).length >= 2,
             getHtml: (s) => {
                 let indices = [];
@@ -281,31 +307,34 @@
             }
         },
         {
-            id: 'lowBall', name: 'Low Ball', score: 123,
+            id: 'lowBall', name: 'Low Ball', score: 6000, tier: 'epic',
+            desc: "Every digit in the number is 4 or below.",
             check: (s) => /^[0-4]+$/.test(s),
             getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'highRoll', name: 'High Roll', score: 789,
+            id: 'highRoll', name: 'High Roll', score: 6000, tier: 'epic',
+            desc: "Every digit in the number is 5 or above.",
             check: (s) => /^[5-9]+$/.test(s),
             getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'heterogeneous', name: 'Heterogeneous', score: 1234,
+            id: 'heterogeneous', name: 'Heterogeneous', score: 180, tier: 'uncommon',
+            desc: "Every single digit is completely unique.",
             check: (s) => new Set(s).size === s.length && s.length > 1,
             getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'lucky7', name: 'Lucky 7', score: 7,
+            id: 'lucky7', name: 'Lucky 7', score: 150, tier: 'uncommon',
+            desc: "The entire number is cleanly divisible by 7.",
             check: (s) => Number(s) % 7 === 0 && Number(s) > 0,
             getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'runner', name: 'Runner', score: 123,
+            id: 'runner', name: 'Runner', score: 1500, tier: 'rare',
+            desc: "Three or more digits are in perfect ascending order.",
             check: (s) => s.length >= 3 && s.split('').some((c, i) => 
-                i < s.length-2 && 
-                parseInt(s[i+1]) === parseInt(c)+1 && 
-                parseInt(s[i+2]) === parseInt(c)+2
+                i < s.length-2 && parseInt(s[i+1]) === parseInt(c)+1 && parseInt(s[i+2]) === parseInt(c)+2
             ),
             getHtml: (s) => {
                 let idx = s.split('').findIndex((c, i) => i < s.length-2 && parseInt(s[i+1]) === parseInt(c)+1 && parseInt(s[i+2]) === parseInt(c)+2);
@@ -313,37 +342,41 @@
             }
         },
         {
-            id: 'pocketMirror', name: 'Pocket Mirror', score: 5665,
+            id: 'pocketMirror', name: 'Pocket Mirror', score: 1200, tier: 'rare',
+            desc: "Contains a mirrored palindrome inside the number.",
             check: (s) => {
                 if(s.length < 3) return false;
                 for(let i=0; i<s.length-2; i++) {
-                    if (s[i] === s[i+2]) return true; // 3 length (e.g. 181)
-                    if (i<s.length-3 && s[i] === s[i+3] && s[i+1] === s[i+2]) return true; // 4 length (e.g. 1881)
+                    if (s[i] === s[i+2]) return true; 
+                    if (i<s.length-3 && s[i] === s[i+3] && s[i+1] === s[i+2]) return true;
                 }
                 return false;
             },
             getHtml: (s) => {
-                for(let i=0; i<s.length-3; i++) { // Check 4 length first
+                for(let i=0; i<s.length-3; i++) {
                     if (s[i] === s[i+3] && s[i+1] === s[i+2]) return highlightIndices(s, [i, i+1, i+2, i+3]);
                 }
-                for(let i=0; i<s.length-2; i++) { // Then 3 length
+                for(let i=0; i<s.length-2; i++) {
                     if (s[i] === s[i+2]) return highlightIndices(s, [i, i+1, i+2]);
                 }
                 return s;
             }
         },
         {
-            id: 'mirror', name: 'Mirror', score: 8008,
+            id: 'mirror', name: 'Mirror', score: 50000, tier: 'legendary',
+            desc: "The entire number reads the exact same backwards.",
             check: (s) => s.length > 1 && s === s.split('').reverse().join(''),
             getHtml: (s) => highlightIndices(s, allIndices(s.length))
         },
         {
-            id: 'translucent', name: 'Translucent', score: 1001,
+            id: 'translucent', name: 'Translucent', score: 7500, tier: 'epic',
+            desc: "The number starts and ends with a zero.",
             check: (s) => s.length >= 2 && s.startsWith('0') && s.endsWith('0'),
             getHtml: (s) => highlightIndices(s, [0, s.length-1])
         },
         {
-            id: 'century', name: 'Century', score: 100,
+            id: 'century', name: 'Century', score: 1000, tier: 'rare',
+            desc: "The number ends with double zeros.",
             check: (s) => s.length >= 2 && s.endsWith('00'),
             getHtml: (s) => highlightIndices(s, [s.length-2, s.length-1])
         }
@@ -354,16 +387,13 @@
        ===================================================================== */
     const TREE = [
         { id: "root", title: "Core Engine", desc: "+20% Base Points", cost: 0, req: [], tier: 0 },
-        
-        { id: "luck1", title: "RNG Manipulator", desc: "Slightly increased chance for rare string lengths", cost: 50, req: ["root"], tier: 1 },
-        { id: "time1", title: "Clockwork I", desc: "-1.5s Cooldown", cost: 100, req: ["root"], tier: 1 },
-        { id: "pts1", title: "Score Multiplier", desc: "+50% points from Achievements", cost: 150, req: ["root"], tier: 1 },
-        
-        { id: "luck2", title: "Anomaly", desc: "Huge boost to 7-digit and 1-digit lengths", cost: 500, req: ["luck1"], tier: 2 },
-        { id: "time2", title: "Clockwork II", desc: "-2s Cooldown", cost: 800, req: ["time1"], tier: 2 },
-        { id: "pts2", title: "Combo Master", desc: "2x points if total base score > 1000", cost: 1200, req: ["pts1"], tier: 2 },
-        
-        { id: "apex", title: "Apex System", desc: "-3s CD & +100% Points", cost: 5000, req: ["luck2", "time2", "pts2"], tier: 3 }
+        { id: "luck1", title: "RNG Manipulator", desc: "Boost rare string lengths", cost: 250, req: ["root"], tier: 1 },
+        { id: "time1", title: "Clockwork I", desc: "-1.5s Cooldown", cost: 500, req: ["root"], tier: 1 },
+        { id: "pts1", title: "Score Multiplier", desc: "+50% Points", cost: 750, req: ["root"], tier: 1 },
+        { id: "luck2", title: "Anomaly", desc: "Huge boost to lengths 1 & 7", cost: 2500, req: ["luck1"], tier: 2 },
+        { id: "time2", title: "Clockwork II", desc: "-2s Cooldown", cost: 4000, req: ["time1"], tier: 2 },
+        { id: "pts2", title: "Combo Master", desc: "2x pts if base score > 1500", cost: 6000, req: ["pts1"], tier: 2 },
+        { id: "apex", title: "Apex System", desc: "-3s CD & +100% Points", cost: 25000, req: ["luck2", "time2", "pts2"], tier: 3 }
     ];
 
     /* =====================================================================
@@ -392,9 +422,7 @@
 
     function generateNumber(length) {
         let res = "";
-        for (let i = 0; i < length; i++) {
-            res += Math.floor(Math.random() * 10).toString();
-        }
+        for (let i = 0; i < length; i++) res += Math.floor(Math.random() * 10).toString();
         return res;
     }
 
@@ -405,17 +433,14 @@
         document.getElementById("btn-roll").disabled = true;
         document.getElementById("btn-roll").innerText = "Rolling...";
         
-        // Clear previous results
         document.getElementById("achievements-container").innerHTML = "";
         document.getElementById("final-banner").style.opacity = "0";
         
         let targetLen = determineLength();
         let targetStr = generateNumber(targetLen);
         
-        // Slower scramble animation
         let display = document.getElementById("number-display");
         let cycles = 0;
-        let maxCycles = 15 + (targetLen * 2); // Scales with length
         let lockedStr = "";
         
         let scrambleTimer = setInterval(() => {
@@ -423,12 +448,9 @@
             let tempStr = lockedStr;
             let remainingLen = targetLen - lockedStr.length;
             
-            for(let i=0; i<remainingLen; i++) {
-                tempStr += Math.floor(Math.random() * 10);
-            }
+            for(let i=0; i<remainingLen; i++) tempStr += Math.floor(Math.random() * 10);
             display.innerText = tempStr;
 
-            // Lock in a character slowly
             if (cycles % 4 === 0 && lockedStr.length < targetLen) {
                 lockedStr += targetStr[lockedStr.length];
             }
@@ -438,7 +460,7 @@
                 display.innerText = targetStr;
                 processNumber(targetStr);
             }
-        }, 80); // 80ms per tick
+        }, 80); 
     }
 
     /* =====================================================================
@@ -447,8 +469,6 @@
     
     function processNumber(numStr) {
         let earned = [];
-        
-        // Important rule filters: Double pair and Consec double override standard pair/consec
         let matchedIds = [];
 
         ACHIEVEMENTS.forEach(ach => {
@@ -458,22 +478,14 @@
             }
         });
 
-        // Filter out redundancies based on rules
-        if (matchedIds.includes("consecDoublePair")) {
-            earned = earned.filter(a => a.id !== "consecPair" && a.id !== "pair" && a.id !== "doublePair");
-        } else if (matchedIds.includes("doublePair")) {
-            earned = earned.filter(a => a.id !== "pair");
-        } else if (matchedIds.includes("consecPair")) {
-            earned = earned.filter(a => a.id !== "pair");
-        }
-        if (matchedIds.includes("luckySevens")) {
-            earned = earned.filter(a => a.id !== "sevens");
-        }
-        if (matchedIds.includes("mirror")) {
-            earned = earned.filter(a => a.id !== "pocketMirror");
-        }
+        // Filter overlaps
+        if (matchedIds.includes("consecDoublePair")) earned = earned.filter(a => a.id !== "consecPair" && a.id !== "pair" && a.id !== "doublePair");
+        else if (matchedIds.includes("doublePair")) earned = earned.filter(a => a.id !== "pair");
+        else if (matchedIds.includes("consecPair")) earned = earned.filter(a => a.id !== "pair");
+        
+        if (matchedIds.includes("luckySevens")) earned = earned.filter(a => a.id !== "sevens");
+        if (matchedIds.includes("mirror")) earned = earned.filter(a => a.id !== "pocketMirror");
 
-        // Display slowly
         displayAchievementsSlowly(earned, numStr);
     }
 
@@ -491,18 +503,21 @@
                 div.className = "achievement-card";
                 div.innerHTML = `
                     <div class="ach-info">
-                        <span class="ach-name">${ach.name}</span>
-                        <span class="ach-score">${ach.score.toLocaleString()} pts</span>
+                        <div class="ach-header">
+                            <span class="ach-name">${ach.name}</span>
+                            <span class="tier-badge badge-${ach.tier}">${ach.tier}</span>
+                        </div>
+                        <div class="ach-desc">${ach.desc}</div>
+                        <div class="ach-score">+${ach.score.toLocaleString()} pts</div>
                     </div>
                     <div class="ach-num-display">${ach.html}</div>
                 `;
                 container.appendChild(div);
                 
-                // Scroll if needed
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
                 idx++;
-                setTimeout(showNext, 600); // 600ms delay between achievements
+                setTimeout(showNext, 600); 
             } else {
                 finalizeRoll(totalBaseScore);
             }
@@ -514,14 +529,13 @@
     function finalizeRoll(baseScore) {
         let finalScore = baseScore;
 
-        // Apply Multipliers
         let mult = 1;
         if (GAME.upgrades.includes("root")) mult += 0.2;
         if (GAME.upgrades.includes("pts1")) mult += 0.5;
         if (GAME.upgrades.includes("apex")) mult += 1.0;
         
         finalScore = Math.floor(finalScore * mult);
-        if (GAME.upgrades.includes("pts2") && baseScore > 1000) finalScore *= 2;
+        if (GAME.upgrades.includes("pts2") && baseScore > 1500) finalScore *= 2;
 
         GAME.pts += finalScore;
         GAME.rolls++;
@@ -529,21 +543,20 @@
 
         updateUI();
 
-        // Rarity Banner
         let banner = document.getElementById("final-banner");
         let rarityText, tierClass;
         
-        if (finalScore > 100000) { rarityText = "MYTHIC"; tierClass = "tier-mythic"; }
-        else if (finalScore > 10000) { rarityText = "LEGENDARY"; tierClass = "tier-legendary"; }
-        else if (finalScore > 2000) { rarityText = "EPIC"; tierClass = "tier-epic"; }
-        else if (finalScore > 500) { rarityText = "RARE"; tierClass = "tier-rare"; }
-        else { rarityText = "COMMON"; tierClass = "tier-common"; }
+        // Final tier thresholds adjusted to match the new scoring system
+        if (finalScore >= 150000) { rarityText = "MYTHIC"; tierClass = "tier-text-mythic"; }
+        else if (finalScore >= 25000) { rarityText = "LEGENDARY"; tierClass = "tier-text-legendary"; }
+        else if (finalScore >= 5000) { rarityText = "EPIC"; tierClass = "tier-text-epic"; }
+        else if (finalScore >= 1000) { rarityText = "RARE"; tierClass = "tier-text-rare"; }
+        else { rarityText = "COMMON"; tierClass = "tier-text-common"; }
 
         banner.innerText = `${rarityText} ROLL! (+${finalScore.toLocaleString()} pts)`;
         banner.className = `final-banner ${tierClass}`;
         banner.style.opacity = "1";
 
-        // Cooldown
         let cd = baseCooldown;
         if (GAME.upgrades.includes("time1")) cd -= 1500;
         if (GAME.upgrades.includes("time2")) cd -= 2000;
@@ -569,7 +582,7 @@
         let btn = document.getElementById("btn-roll");
         let txt = document.getElementById("cooldown-display");
         
-        if (GAME.isRolling) return; // Managed by rolling func
+        if (GAME.isRolling) return; 
         
         let now = Date.now();
         if (now >= GAME.cooldownReady) {
@@ -585,7 +598,7 @@
     }, 100);
 
     /* =====================================================================
-       7. UPGRADE TREE RENDERING (Same layout logic as before)
+       7. UPGRADE TREE RENDERING
        ===================================================================== */
     
     function canBuy(node) {
@@ -601,9 +614,6 @@
             GAME.upgrades.push(id);
             updateUI();
             saveGame();
-            if (id === 'root') { // Instantly unlock root free
-                document.getElementById('achievements-container').innerHTML = "<div style='color:var(--gold);'>Core Engine Initialized. RNG systems online.</div>";
-            }
         }
     }
 
@@ -631,7 +641,7 @@
             document.getElementById(`tier-${node.tier}`).appendChild(el);
         });
         
-        setTimeout(drawLines, 50); // slight delay to let DOM render sizes
+        setTimeout(drawLines, 50); 
     }
 
     function drawLines() {
@@ -681,7 +691,7 @@
     function checkCode() {
         let code = document.getElementById("admin-code").value;
         if (code === "motherlode") {
-            GAME.pts += 50000;
+            GAME.pts += 500000; // Increased to match new scaling
             document.getElementById("admin-code").value = "";
             updateUI();
             saveGame();
