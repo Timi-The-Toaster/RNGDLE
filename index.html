@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RNGdle - Upgrade Tree</title>
+    <title>RNGdle - Upgrade Tree Game</title>
     <style>
         :root {
-            --bg-color: #0f0f12;
-            --card-bg: #1a1a24;
-            --accent: #7289da;
-            --accent-gold: #f1c40f;
-            --text-color: #ffffff;
-            --subtext: #a0a0b0;
+            --bg: #0b0d12;
+            --card-bg: #151922;
+            --card-border: #232a3b;
+            --accent: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.4);
+            --gold: #ffb703;
+            --text: #e2e8f0;
+            --subtext: #94a3b8;
+            --locked: #334155;
         }
 
         * {
@@ -19,11 +22,12 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,14 +36,14 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
-        /* Header Stats */
+        /* Stats Bar */
         .stats-bar {
             background: var(--card-bg);
             border-radius: 12px;
@@ -47,12 +51,12 @@
             display: flex;
             justify-content: space-around;
             text-align: center;
-            border: 1px solid #2a2a3a;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .stat-box h3 {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--subtext);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -61,136 +65,193 @@
         .stat-box p {
             font-size: 1.8rem;
             font-weight: bold;
-            color: var(--accent-gold);
-            margin-top: 5px;
+            color: var(--accent);
+            margin-top: 4px;
         }
 
-        /* Roll Area */
-        .roll-section {
+        /* Generator Area */
+        .generator-card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: 16px;
+            padding: 35px;
             text-align: center;
-            border: 1px solid #2a2a3a;
+            border: 1px solid var(--card-border);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
         }
 
-        .result-display {
-            min-height: 120px;
+        .number-box {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 3.8rem;
+            font-weight: 900;
+            letter-spacing: 8px;
+            color: #ffffff;
+            background: #06080c;
+            padding: 15px 40px;
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            min-height: 95px;
+            min-width: 320px;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            width: 100%;
         }
 
-        .rarity-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            text-shadow: 0 0 10px rgba(255,255,255,0.2);
-        }
-
-        .rarity-chance {
-            font-size: 1.1rem;
-            color: var(--subtext);
-            margin-top: 5px;
+        .rarity-tag {
+            font-size: 1.25rem;
+            font-weight: 700;
+            min-height: 30px;
         }
 
         .roll-btn {
-            background: linear-gradient(135deg, #4752c4, #7289da);
-            color: white;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #fff;
             border: none;
-            padding: 15px 50px;
+            padding: 16px 50px;
             font-size: 1.3rem;
-            font-weight: bold;
+            font-weight: 800;
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(114, 137, 218, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .roll-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(114, 137, 218, 0.6);
+            box-shadow: 0 6px 25px rgba(0, 198, 255, 0.6);
         }
 
         .roll-btn:disabled {
-            background: #3a3a4c;
-            color: #7a7a8c;
+            background: #1e293b;
+            color: #475569;
             cursor: not-allowed;
             box-shadow: none;
         }
 
-        .timer-display {
-            font-size: 1.1rem;
+        .timer-text {
+            font-size: 0.95rem;
             color: var(--subtext);
         }
 
-        /* Upgrade Tree */
+        /* Tree Section */
+        .tree-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px 20px;
+            border: 1px solid var(--card-border);
+            position: relative;
+        }
+
         .section-title {
             font-size: 1.4rem;
-            margin-bottom: 10px;
             color: #fff;
+            text-align: center;
+            margin-bottom: 25px;
         }
 
-        .upgrades-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+        /* Tree Diagram Container */
+        .tree-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+            padding: 20px 0;
+            width: 100%;
         }
 
-        .upgrade-card {
-            background: var(--card-bg);
+        .svg-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .tree-tier {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            z-index: 2;
+        }
+
+        /* Node Styling */
+        .tree-node {
+            background: #0f131c;
+            border: 2px solid var(--locked);
             border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #2a2a3a;
+            padding: 15px;
+            width: 180px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            gap: 10px;
+            position: relative;
         }
 
-        .upgrade-info h4 {
-            font-size: 1.1rem;
-            color: #fff;
+        .tree-node.unlocked {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
         }
 
-        .upgrade-info p {
-            font-size: 0.85rem;
-            color: var(--subtext);
-            margin-top: 4px;
+        .tree-node.bought {
+            background: linear-gradient(145deg, #0d2538, #0f131c);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
         }
 
-        .buy-btn {
-            background: #2b2b3c;
-            border: 1px solid var(--accent);
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        .buy-btn:hover:not(:disabled) {
-            background: var(--accent);
-        }
-
-        .buy-btn:disabled {
-            border-color: #3a3a4c;
-            color: #5a5a6c;
+        .tree-node.locked {
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* Footer & Admin Secret */
-        .admin-section {
+        .node-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .node-desc {
+            font-size: 0.75rem;
+            color: var(--subtext);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .node-cost {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--gold);
+            background: rgba(255, 183, 3, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .node-status {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        /* Admin Box */
+        .admin-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 15px;
-            border: 1px solid #2a2a3a;
+            padding: 15px 20px;
+            border: 1px solid var(--card-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -202,8 +263,8 @@
         }
 
         .admin-input {
-            background: #0f0f12;
-            border: 1px solid #3a3a4c;
+            background: #0b0d12;
+            border: 1px solid var(--card-border);
             color: #fff;
             padding: 8px 12px;
             border-radius: 6px;
@@ -211,7 +272,7 @@
         }
 
         .admin-btn {
-            background: #3a3a4c;
+            background: #232a3b;
             color: #fff;
             border: none;
             padding: 8px 15px;
@@ -221,19 +282,16 @@
 
         .admin-badge {
             display: none;
-            background: #e74c3c;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            color: #ef4444;
             font-weight: bold;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Top Stats -->
+    <!-- Top Stats Bar -->
     <div class="stats-bar">
         <div class="stat-box">
             <h3>Points</h3>
@@ -244,225 +302,429 @@
             <p id="rolls-display">0</p>
         </div>
         <div class="stat-box">
-            <h3>Luck Multiplier</h3>
-            <p id="luck-display">1.0x</p>
+            <h3>Cooldown</h3>
+            <p id="cd-display">5m 00s</p>
         </div>
     </div>
 
-    <!-- Main Roll Area -->
-    <div class="roll-section">
-        <div class="result-display" id="result-display">
-            <div class="rarity-title" style="color: #a0a0a0;">Ready to Roll</div>
-            <div class="rarity-chance">Press the button below to test your luck!</div>
-        </div>
-
-        <button class="roll-btn" id="roll-btn" onclick="roll()">ROLL</button>
-        <div class="timer-display" id="timer-display">Ready!</div>
+    <!-- Generator / Scramble Section -->
+    <div class="generator-card">
+        <div class="number-box" id="number-display">------</div>
+        <div class="rarity-tag" id="rarity-display" style="color: var(--subtext);">Click Generate to Roll</div>
+        
+        <button class="roll-btn" id="roll-btn" onclick="triggerRoll()">Generate Number</button>
+        <div class="timer-text" id="timer-display">Ready!</div>
     </div>
 
-    <!-- Upgrade Tree -->
-    <h2 class="section-title">Upgrade Tree</h2>
-    <div class="upgrades-grid">
-        <!-- Upgrade 1: Luck -->
-        <div class="upgrade-card">
-            <div class="upgrade-info">
-                <h4>Luck Boost</h4>
-                <p>Increases your chance of rolling rare items.</p>
-                <p>Current: <span id="luck-level-text">+0%</span></p>
-            </div>
-            <button class="buy-btn" id="buy-luck" onclick="buyUpgrade('luck')">
-                Upgrade (<span id="luck-cost">50</span> pts)
-            </button>
-        </div>
+    <!-- Upgrade Tree Section -->
+    <div class="tree-section">
+        <h2 class="section-title">Upgrade Tree</h2>
+        
+        <div class="tree-container" id="tree-container">
+            <svg class="svg-lines" id="svg-lines"></svg>
 
-        <!-- Upgrade 2: Point Multiplier -->
-        <div class="upgrade-card">
-            <div class="upgrade-info">
-                <h4>Point Doubler</h4>
-                <p>Increases points gained from every roll.</p>
-                <p>Current: <span id="points-level-text">1.0x</span></p>
+            <!-- Tier 0: Root -->
+            <div class="tree-tier">
+                <div class="tree-node" id="node-root" onclick="buyNode('root')">
+                    <div>
+                        <div class="node-title">Core Engine</div>
+                        <div class="node-desc">Unlocks the tree branches & grants +20% base points.</div>
+                    </div>
+                    <div class="node-cost" id="cost-root">10 Pts</div>
+                </div>
             </div>
-            <button class="buy-btn" id="buy-points" onclick="buyUpgrade('points')">
-                Upgrade (<span id="points-cost">100</span> pts)
-            </button>
-        </div>
 
-        <!-- Upgrade 3: Cooldown Reducer -->
-        <div class="upgrade-card">
-            <div class="upgrade-info">
-                <h4>Chrono Shift</h4>
-                <p>Reduces roll cooldown by 30s per level (Min 10s).</p>
-                <p>Current: <span id="cooldown-level-text">5m 00s</span></p>
+            <!-- Tier 1: Branching (Luck, Time, Economy) -->
+            <div class="tree-tier">
+                <div class="tree-node" id="node-luck1" onclick="buyNode('luck1')">
+                    <div>
+                        <div class="node-title">Rare Tuning</div>
+                        <div class="node-desc">+50% higher chance to hit &lt;4 or 7 digit numbers.</div>
+                    </div>
+                    <div class="node-cost" id="cost-luck1">50 Pts</div>
+                </div>
+
+                <div class="tree-node" id="node-time1" onclick="buyNode('time1')">
+                    <div>
+                        <div class="node-title">Chrono Gear</div>
+                        <div class="node-desc">Reduces roll wait time by 1 Minute (4m cd).</div>
+                    </div>
+                    <div class="node-cost" id="cost-time1">75 Pts</div>
+                </div>
+
+                <div class="tree-node" id="node-econ1" onclick="buyNode('econ1')">
+                    <div>
+                        <div class="node-title">Point Multiplier</div>
+                        <div class="node-desc">Doubles (2x) point income from all rolls.</div>
+                    </div>
+                    <div class="node-cost" id="cost-econ1">60 Pts</div>
+                </div>
             </div>
-            <button class="buy-btn" id="buy-cooldown" onclick="buyUpgrade('cooldown')">
-                Upgrade (<span id="cooldown-cost">200</span> pts)
-            </button>
+
+            <!-- Tier 2: Advanced Unlocks -->
+            <div class="tree-tier">
+                <div class="tree-node" id="node-luck2" onclick="buyNode('luck2')">
+                    <div>
+                        <div class="node-title">1 & 2 Digit Finder</div>
+                        <div class="node-desc">3x Luck for ultra-rare 1-Digit and 2-Digit rolls!</div>
+                    </div>
+                    <div class="node-cost" id="cost-luck2">250 Pts</div>
+                </div>
+
+                <div class="tree-node" id="node-time2" onclick="buyNode('time2')">
+                    <div>
+                        <div class="node-title">Overclock Reveal</div>
+                        <div class="node-desc">Scramble reveal animation finishes 2x faster.</div>
+                    </div>
+                    <div class="node-cost" id="cost-time2">200 Pts</div>
+                </div>
+
+                <div class="tree-node" id="node-time3" onclick="buyNode('time3')">
+                    <div>
+                        <div class="node-title">Time Warp</div>
+                        <div class="node-desc">Reduces cooldown by another 2 minutes (2m cd).</div>
+                    </div>
+                    <div class="node-cost" id="cost-time3">500 Pts</div>
+                </div>
+
+                <div class="tree-node" id="node-econ2" onclick="buyNode('econ2')">
+                    <div>
+                        <div class="node-title">Jackpot Bonus</div>
+                        <div class="node-desc">5x Points on Mythic & Divine rolls (1, 2, 7 Digits).</div>
+                    </div>
+                    <div class="node-cost" id="cost-econ2">350 Pts</div>
+                </div>
+            </div>
+
+            <!-- Tier 3: Apex Singularity -->
+            <div class="tree-tier">
+                <div class="tree-node" id="node-apex" onclick="buyNode('apex')">
+                    <div>
+                        <div class="node-title">RNG Singularity</div>
+                        <div class="node-desc">15% chance for INSTANT ROLL REFUND + 3x Points!</div>
+                    </div>
+                    <div class="node-cost" id="cost-apex">1500 Pts</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Admin Secret Section -->
-    <div class="admin-section">
+    <!-- Admin Section -->
+    <div class="admin-card">
         <div>
-            <span style="color: var(--subtext); font-size: 0.9rem;">Secret Admin Code:</span>
+            <span style="color: var(--subtext); font-size: 0.9rem;">Secret Code:</span>
             <span class="admin-badge" id="admin-badge">ADMIN MODE ACTIVE (0s Cooldown)</span>
         </div>
         <div class="admin-input-group" id="admin-input-group">
-            <input type="password" id="admin-code" class="admin-input" placeholder="Enter code...">
+            <input type="password" id="admin-code" class="admin-input" placeholder="Enter secret code...">
             <button class="admin-btn" onclick="checkAdmin()">Submit</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- Rarity Table (Rarest to Commonest) ---
-    const RARITIES = [
-        { name: "GODLY", chance: 1000000, points: 5000000, color: "#ffffff" },
-        { name: "Celestial", chance: 100000, points: 500000, color: "#ff77ff" },
-        { name: "Divine", chance: 25000, points: 100000, color: "#ffff55" },
-        { name: "Exotic", chance: 5000, points: 15000, color: "#00ffff" },
-        { name: "Mythic", chance: 1000, points: 2500, color: "#ff5555" },
-        { name: "Legendary", chance: 250, points: 500, color: "#ffaa00" },
-        { name: "Epic", chance: 50, points: 100, color: "#aa00aa" },
-        { name: "Rare", chance: 15, points: 30, color: "#5555ff" },
-        { name: "Uncommon", chance: 4, points: 10, color: "#55ff55" },
-        { name: "Common", chance: 1, points: 2, color: "#a0a0a0" }
+    const SYMBOLS = ['@', '*', '$', ')', '^', '#', '%', '!', '&', '?', 'X', '9', '4', '7', '1', '8'];
+
+    // --- Digit Outcome Pool ---
+    const DIGIT_TABLE = [
+        { digits: 1, weight: 0.05,  points: 100000, name: "MYTHIC (1 Digit)",    color: "#ff0055" },
+        { digits: 7, weight: 0.10,  points: 50000,  name: "DIVINE (7 Digits)",   color: "#00f2fe" },
+        { digits: 2, weight: 0.25,  points: 15000,  name: "LEGENDARY (2 Digits)",color: "#ffb703" },
+        { digits: 3, weight: 1.20,  points: 2500,   name: "EPIC (3 Digits)",     color: "#a855f7" },
+        { digits: 4, weight: 5.00,  points: 400,    name: "RARE (4 Digits)",     color: "#3b82f6" },
+        { digits: 5, weight: 15.00, points: 75,     name: "UNCOMMON (5 Digits)", color: "#10b981" },
+        { digits: 6, weight: 78.40, points: 10,     name: "COMMON (6 Digits)",   color: "#94a3b8" }
     ];
 
-    // --- Game State ---
+    // --- Upgrade Tree Database ---
+    const TREE = {
+        'root':  { cost: 10,   bought: false, requires: [] },
+        'luck1': { cost: 50,   bought: false, requires: ['root'] },
+        'time1': { cost: 75,   bought: false, requires: ['root'] },
+        'econ1': { cost: 60,   bought: false, requires: ['root'] },
+        'luck2': { cost: 250,  bought: false, requires: ['luck1'] },
+        'time2': { cost: 200,  bought: false, requires: ['time1'] },
+        'time3': { cost: 500,  bought: false, requires: ['time1'] },
+        'econ2': { cost: 350,  bought: false, requires: ['econ1'] },
+        'apex':  { cost: 1500, bought: false, requires: ['luck2', 'econ2'] }
+    };
+
+    // --- State ---
     let state = {
         points: 0,
         rolls: 0,
         lastRollTime: 0,
         isAdmin: false,
-        upgrades: {
-            luck: { level: 0, baseCost: 50, costMult: 2 },
-            points: { level: 0, baseCost: 100, costMult: 2.5 },
-            cooldown: { level: 0, baseCost: 200, costMult: 3 }
-        }
+        isRolling: false
     };
 
-    // --- Core Gameplay Functions ---
-
-    function getLuckMultiplier() {
-        return 1 + (state.upgrades.luck.level * 0.25); // +25% luck per level
-    }
-
-    function getPointMultiplier() {
-        return 1 + (state.upgrades.points.level * 0.5); // +50% points per level
-    }
-
+    // --- Game Logic Helpers ---
     function getCooldownSeconds() {
-        if (state.isAdmin) return 0; // Admin mode removes cooldown
-        let cd = 300 - (state.upgrades.cooldown.level * 30); // Base 300s (5m), -30s per level
-        return Math.max(10, cd); // Minimum 10 seconds standard
-    }
-
-    function roll() {
-        if (!canRoll()) return;
-
-        state.rolls++;
-        state.lastRollTime = Date.now();
-
-        // Roll Math with Luck
-        const luck = getLuckMultiplier();
-        let rolledRarity = RARITIES[RARITIES.length - 1]; // Default to Common
-
-        for (let r of RARITIES) {
-            // Chance threshold = 1 / (rarity.chance / luck)
-            let chanceThreshold = luck / r.chance;
-            if (Math.random() < chanceThreshold) {
-                rolledRarity = r;
-                break; // Got the rarest possible roll in descending order
-            }
-        }
-
-        // Points calculation
-        const earnedPoints = Math.floor(rolledRarity.points * getPointMultiplier());
-        state.points += earnedPoints;
-
-        // Display result
-        const resultDisplay = document.getElementById('result-display');
-        resultDisplay.innerHTML = `
-            <div class="rarity-title" style="color: ${rolledRarity.color};">${rolledRarity.name}</div>
-            <div class="rarity-chance">1 in ${rolledRarity.chance.toLocaleString()} chance | +${earnedPoints.toLocaleString()} Points</div>
-        `;
-
-        updateUI();
+        if (state.isAdmin) return 0;
+        let cd = 300; // 5 minutes standard (300s)
+        if (TREE.time1.bought) cd -= 60; // 4m
+        if (TREE.time3.bought) cd -= 120; // 2m
+        return Math.max(0, cd);
     }
 
     function canRoll() {
+        if (state.isRolling) return false;
         if (state.isAdmin) return true;
         const elapsed = (Date.now() - state.lastRollTime) / 1000;
         return elapsed >= getCooldownSeconds();
     }
 
-    // --- Upgrade Logic ---
+    // --- Roll Generator Engine ---
+    function triggerRoll() {
+        if (!canRoll()) return;
 
-    function buyUpgrade(type) {
-        const upg = state.upgrades[type];
-        const cost = getUpgradeCost(type);
+        state.isRolling = true;
+        state.rolls++;
+        state.lastRollTime = Date.now();
 
-        if (state.points >= cost) {
-            state.points -= cost;
-            upg.level++;
+        // 1. Calculate Weights with Upgrade Tree Modifiers
+        let weights = DIGIT_TABLE.map(item => {
+            let w = item.weight;
+            if (TREE.luck1.bought && (item.digits < 4 || item.digits === 7)) {
+                w *= 1.5;
+            }
+            if (TREE.luck2.bought && (item.digits === 1 || item.digits === 2)) {
+                w *= 3.0;
+            }
+            return w;
+        });
+
+        // 2. Roll Weighted Probability
+        let totalWeight = weights.reduce((a, b) => a + b, 0);
+        let rand = Math.random() * totalWeight;
+        let selectedOutcome = DIGIT_TABLE[DIGIT_TABLE.length - 1]; // Fallback to 6 digits
+
+        for (let i = 0; i < DIGIT_TABLE.length; i++) {
+            if (rand < weights[i]) {
+                selectedOutcome = DIGIT_TABLE[i];
+                break;
+            }
+            rand -= weights[i];
+        }
+
+        // 3. Generate Random Digits String
+        let resultStr = "";
+        for (let i = 0; i < selectedOutcome.digits; i++) {
+            if (i === 0) {
+                resultStr += Math.floor(Math.random() * 9 + 1); // No leading zero
+            } else {
+                resultStr += Math.floor(Math.random() * 10);
+            }
+        }
+
+        // 4. Apex Refund Roll Check
+        if (TREE.apex.bought && Math.random() < 0.15) {
+            state.lastRollTime = 0; // Instant cooldown refund!
+        }
+
+        // 5. Scramble Animation
+        playScramble(resultStr, selectedOutcome);
+    }
+
+    function playScramble(targetStr, outcome) {
+        const display = document.getElementById('number-display');
+        const rarityDisplay = document.getElementById('rarity-display');
+
+        rarityDisplay.innerText = "Revealing...";
+        rarityDisplay.style.color = "var(--subtext)";
+
+        let len = targetStr.length;
+        let revealedCount = 0;
+        let ticks = 0;
+        
+        // Speed up scramble if time2 node is bought
+        let ticksPerDigit = TREE.time2.bought ? 2 : 5; 
+        let speedMs = TREE.time2.bought ? 30 : 50;
+
+        const interval = setInterval(() => {
+            ticks++;
+            let scrambleStr = "";
+
+            for (let i = 0; i < len; i++) {
+                if (i < revealedCount) {
+                    scrambleStr += targetStr[i];
+                } else {
+                    scrambleStr += SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+                }
+            }
+
+            display.innerText = scrambleStr;
+
+            if (ticks % ticksPerDigit === 0) {
+                revealedCount++;
+            }
+
+            if (revealedCount > len) {
+                clearInterval(interval);
+                display.innerText = targetStr;
+
+                // Points Calculations
+                let basePts = outcome.points;
+                let multiplier = 1.0;
+
+                if (TREE.root.bought) multiplier += 0.2;
+                if (TREE.econ1.bought) multiplier *= 2.0;
+                if (TREE.econ2.bought && (outcome.digits === 1 || outcome.digits === 2 || outcome.digits === 7)) {
+                    multiplier *= 5.0;
+                }
+                if (TREE.apex.bought) multiplier *= 3.0;
+
+                let totalPts = Math.floor(basePts * multiplier);
+                state.points += totalPts;
+
+                // UI Display
+                rarityDisplay.innerText = `${outcome.name} | +${totalPts.toLocaleString()} Pts`;
+                rarityDisplay.style.color = outcome.color;
+
+                state.isRolling = false;
+                updateUI();
+            }
+        }, speedMs);
+    }
+
+    // --- Upgrade Tree Actions ---
+    function isNodeUnlocked(key) {
+        const node = TREE[key];
+        if (node.requires.length === 0) return true;
+        return node.requires.every(reqKey => TREE[reqKey].bought);
+    }
+
+    function buyNode(key) {
+        const node = TREE[key];
+        if (node.bought) return;
+        if (!isNodeUnlocked(key)) return;
+
+        if (state.points >= node.cost) {
+            state.points -= node.cost;
+            node.bought = true;
             updateUI();
+            drawTreeLines();
         }
     }
 
-    function getUpgradeCost(type) {
-        const upg = state.upgrades[type];
-        return Math.floor(upg.baseCost * Math.pow(upg.costMult, upg.level));
-    }
-
-    // --- Admin Code Check ---
-
+    // --- Admin Secret Code ---
     function checkAdmin() {
-        const input = document.getElementById('admin-code').value.trim();
-        if (input.toLowerCase() === 'admin') {
+        const code = document.getElementById('admin-code').value.trim();
+        if (code.toLowerCase() === 'admin') {
             state.isAdmin = true;
             document.getElementById('admin-badge').style.display = 'inline-block';
             document.getElementById('admin-input-group').style.display = 'none';
             updateUI();
         } else {
-            alert('Invalid Secret Code!');
+            alert("Invalid Code");
         }
     }
 
-    // --- UI & Timer Loop ---
+    // --- Dynamic SVG Tree Connectors ---
+    function drawTreeLines() {
+        const svg = document.getElementById('svg-lines');
+        const container = document.getElementById('tree-container');
+        const cRect = container.getBoundingClientRect();
 
+        svg.innerHTML = ''; // Clear lines
+
+        Object.keys(TREE).forEach(childKey => {
+            const childNode = TREE[childKey];
+            childNode.requires.forEach(parentKey => {
+                const pElem = document.getElementById(`node-${parentKey}`);
+                const cElem = document.getElementById(`node-${childKey}`);
+
+                if (!pElem || !cElem) return;
+
+                const pRect = pElem.getBoundingClientRect();
+                const cRect2 = cElem.getBoundingClientRect();
+
+                // Compute centers relative to tree-container
+                const x1 = pRect.left + pRect.width / 2 - cRect.left;
+                const y1 = pRect.top + pRect.height / 2 - cRect.top;
+                const x2 = cRect2.left + cRect2.width / 2 - cRect.left;
+                const y2 = cRect2.top + cRect2.height / 2 - cRect.top;
+
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x1);
+                line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2);
+                line.setAttribute('y2', y2);
+
+                const parentBought = TREE[parentKey].bought;
+                const childBought = TREE[childKey].bought;
+
+                if (childBought) {
+                    line.setAttribute('stroke', '#ffb703');
+                    line.setAttribute('stroke-width', '3');
+                } else if (parentBought) {
+                    line.setAttribute('stroke', '#00f2fe');
+                    line.setAttribute('stroke-width', '2');
+                } else {
+                    line.setAttribute('stroke', '#334155');
+                    line.setAttribute('stroke-width', '1.5');
+                    line.setAttribute('stroke-dasharray', '4');
+                }
+
+                svg.appendChild(line);
+            });
+        });
+    }
+
+    // --- UI Render ---
     function updateUI() {
-        // Stats
         document.getElementById('points-display').innerText = Math.floor(state.points).toLocaleString();
         document.getElementById('rolls-display').innerText = state.rolls.toLocaleString();
-        document.getElementById('luck-display').innerText = getLuckMultiplier().toFixed(2) + 'x';
-
-        // Upgrades UI
-        document.getElementById('luck-level-text').innerText = '+' + (state.upgrades.luck.level * 25) + '%';
-        document.getElementById('luck-cost').innerText = getUpgradeCost('luck').toLocaleString();
-        document.getElementById('buy-luck').disabled = state.points < getUpgradeCost('luck');
-
-        document.getElementById('points-level-text').innerText = getPointMultiplier().toFixed(1) + 'x';
-        document.getElementById('points-cost').innerText = getUpgradeCost('points').toLocaleString();
-        document.getElementById('buy-points').disabled = state.points < getUpgradeCost('points');
 
         const cdSecs = getCooldownSeconds();
-        const cdMin = Math.floor(cdSecs / 60);
-        const cdRemSec = cdSecs % 60;
-        document.getElementById('cooldown-level-text').innerText = state.isAdmin ? '0s (Admin)' : `${cdMin}m ${cdRemSec < 10 ? '0' : ''}${cdRemSec}s`;
-        document.getElementById('cooldown-cost').innerText = getUpgradeCost('cooldown').toLocaleString();
-        document.getElementById('buy-cooldown').disabled = state.points < getUpgradeCost('cooldown');
+        const mins = Math.floor(cdSecs / 60);
+        const secs = cdSecs % 60;
+        document.getElementById('cd-display').innerText = state.isAdmin ? '0s (Admin)' : `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+
+        // Update Nodes
+        Object.keys(TREE).forEach(key => {
+            const node = TREE[key];
+            const elem = document.getElementById(`node-${key}`);
+            const costElem = document.getElementById(`cost-${key}`);
+            const unlocked = isNodeUnlocked(key);
+
+            elem.className = 'tree-node';
+            if (node.bought) {
+                elem.classList.add('bought');
+                costElem.innerHTML = `<span class="node-status">Purchased</span>`;
+            } else if (unlocked) {
+                elem.classList.add('unlocked');
+                costElem.innerText = `${node.cost} Pts`;
+                if (state.points < node.cost) {
+                    elem.style.opacity = '0.7';
+                } else {
+                    elem.style.opacity = '1';
+                }
+            } else {
+                elem.classList.add('locked');
+                costElem.innerText = `Locked`;
+            }
+        });
+
+        drawTreeLines();
     }
 
     function updateTimer() {
-        const rollBtn = document.getElementById('roll-btn');
+        const btn = document.getElementById('roll-btn');
         const timerDisplay = document.getElementById('timer-display');
 
+        if (state.isRolling) {
+            btn.disabled = true;
+            timerDisplay.innerText = "Rolling...";
+            return;
+        }
+
         if (canRoll()) {
-            rollBtn.disabled = false;
+            btn.disabled = false;
             timerDisplay.innerText = state.isAdmin ? "ADMIN MODE: Unlimited Rolls!" : "Ready to Roll!";
-            timerDisplay.style.color = "#55ff55";
+            timerDisplay.style.color = "#10b981";
         } else {
-            rollBtn.disabled = true;
+            btn.disabled = true;
             const remaining = getCooldownSeconds() - Math.floor((Date.now() - state.lastRollTime) / 1000);
             const mins = Math.floor(remaining / 60);
             const secs = remaining % 60;
@@ -471,11 +733,13 @@
         }
     }
 
-    // Run timer loop every 100ms
+    // Interval Loops
     setInterval(updateTimer, 100);
-    
-    // Initial UI Sync
+    window.addEventListener('resize', drawTreeLines);
+
+    // Initial setup
     updateUI();
+    setTimeout(drawTreeLines, 100);
 </script>
 </body>
 </html>
