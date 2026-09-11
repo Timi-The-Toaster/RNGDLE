@@ -3,743 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RNGdle - Upgrade Tree Game</title>
+    <title>RNGdle - Achievement Hunter</title>
     <style>
         :root {
-            --bg: #0b0d12;
-            --card-bg: #151922;
-            --card-border: #232a3b;
-            --accent: #00f2fe;
-            --accent-glow: rgba(0, 242, 254, 0.4);
-            --gold: #ffb703;
-            --text: #e2e8f0;
+            --bg: #090a0f;
+            --card-bg: #131722;
+            --card-border: #262d40;
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.4);
+            --gold: #f59e0b;
+            --text: #f8fafc;
             --subtext: #94a3b8;
             --locked: #334155;
+            --hl-color: #38bdf8;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 950px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; }
+        body { background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { max-width: 950px; width: 100%; display: flex; flex-direction: column; gap: 25px; }
 
         /* Stats Bar */
-        .stats-bar {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-
-        .stat-box h3 {
-            font-size: 0.8rem;
-            color: var(--subtext);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-box p {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--accent);
-            margin-top: 4px;
-        }
+        .stats-bar { background: var(--card-bg); border-radius: 12px; padding: 20px; display: flex; justify-content: space-around; text-align: center; border: 1px solid var(--card-border); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .stat-box h3 { font-size: 0.8rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-box p { font-size: 1.8rem; font-weight: bold; color: var(--accent); margin-top: 4px; }
 
         /* Generator Area */
-        .generator-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 35px;
-            text-align: center;
-            border: 1px solid var(--card-border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        .generator-card { background: var(--card-bg); border-radius: 16px; padding: 35px; text-align: center; border: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+        
+        .number-box { 
+            font-family: 'Courier New', monospace; font-size: 4rem; font-weight: 900; letter-spacing: 10px; color: #ffffff; 
+            background: #050608; padding: 20px 40px; border-radius: 12px; border: 2px solid var(--accent); 
+            box-shadow: 0 0 20px var(--accent-glow); min-height: 110px; min-width: 350px; display: flex; justify-content: center; align-items: center; 
         }
 
-        .number-box {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 3.8rem;
-            font-weight: 900;
-            letter-spacing: 8px;
-            color: #ffffff;
-            background: #06080c;
-            padding: 15px 40px;
-            border-radius: 12px;
-            border: 2px solid var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-            min-height: 95px;
-            min-width: 320px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        /* Highlighting Class */
+        .hl { color: var(--hl-color); text-shadow: 0 0 12px var(--hl-color); font-weight: 900; }
 
-        .rarity-tag {
-            font-size: 1.25rem;
-            font-weight: 700;
-            min-height: 30px;
-        }
+        /* Roll Button & Timer */
+        .roll-btn { background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; border: none; padding: 16px 50px; font-size: 1.3rem; font-weight: 800; border-radius: 30px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); text-transform: uppercase; letter-spacing: 1px; }
+        .roll-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(168, 85, 247, 0.6); }
+        .roll-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; box-shadow: none; }
+        .timer-text { font-size: 0.95rem; color: var(--subtext); }
 
-        .roll-btn {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            color: #fff;
-            border: none;
-            padding: 16px 50px;
-            font-size: 1.3rem;
-            font-weight: 800;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Achievements Display Area */
+        .achievements-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .achievement-card { 
+            background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            animation: slideIn 0.5s ease forwards; opacity: 0; transform: translateY(10px);
         }
+        .ach-info { display: flex; flex-direction: column; align-items: flex-start; }
+        .ach-name { font-weight: bold; font-size: 1.1rem; color: #fff; }
+        .ach-score { font-size: 0.85rem; color: var(--gold); }
+        .ach-num-display { font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: bold; letter-spacing: 4px; background: #000; padding: 5px 15px; border-radius: 6px; }
 
-        .roll-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 198, 255, 0.6);
-        }
+        /* Final Rarity Banner */
+        .final-banner { margin-top: 20px; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 15px; border-radius: 8px; width: 100%; }
+        .tier-common { color: #94a3b8; text-shadow: 0 0 10px rgba(148,163,184,0.5); }
+        .tier-rare { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        .tier-epic { color: #a855f7; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
+        .tier-legendary { color: var(--gold); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+        .tier-mythic { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
 
-        .roll-btn:disabled {
-            background: #1e293b;
-            color: #475569;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
 
-        .timer-text {
-            font-size: 0.95rem;
-            color: var(--subtext);
+        /* Upgrade Tree Structure (Compact) */
+        .tree-section { background: var(--card-bg); border-radius: 16px; padding: 30px 20px; border: 1px solid var(--card-border); position: relative; }
+        .section-title { font-size: 1.4rem; color: #fff; text-align: center; margin-bottom: 25px; }
+        .tree-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 20px 0; width: 100%; }
+        .svg-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .tree-tier { display: flex; justify-content: center; gap: 20px; width: 100%; z-index: 2; }
+        
+        .tree-node { 
+            background: #0f131c; border: 2px solid var(--locked); border-radius: 12px; padding: 15px; width: 180px; 
+            text-align: center; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;
         }
+        .tree-node.unlocked { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .tree-node.bought { background: linear-gradient(145deg, #1c142b, #0f131c); border-color: var(--gold); box-shadow: 0 0 15px rgba(245,158,11,0.3); }
+        .tree-node.locked { opacity: 0.5; cursor: not-allowed; }
+        .node-title { font-size: 0.95rem; font-weight: bold; color: #fff; margin-bottom: 6px; }
+        .node-desc { font-size: 0.75rem; color: var(--subtext); margin-bottom: 10px; line-height: 1.2; }
+        .node-cost { font-size: 0.85rem; font-weight: bold; color: var(--gold); background: rgba(245,158,11,0.1); padding: 4px 8px; border-radius: 6px; }
 
-        /* Tree Section */
-        .tree-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 30px 20px;
-            border: 1px solid var(--card-border);
-            position: relative;
-        }
-
-        .section-title {
-            font-size: 1.4rem;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        /* Tree Diagram Container */
-        .tree-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 50px;
-            padding: 20px 0;
-            width: 100%;
-        }
-
-        .svg-lines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .tree-tier {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-            z-index: 2;
-        }
-
-        /* Node Styling */
-        .tree-node {
-            background: #0f131c;
-            border: 2px solid var(--locked);
-            border-radius: 12px;
-            padding: 15px;
-            width: 180px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .tree-node.unlocked {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
-        }
-
-        .tree-node.bought {
-            background: linear-gradient(145deg, #0d2538, #0f131c);
-            border-color: var(--gold);
-            box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
-        }
-
-        .tree-node.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .node-title {
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 6px;
-        }
-
-        .node-desc {
-            font-size: 0.75rem;
-            color: var(--subtext);
-            margin-bottom: 10px;
-            line-height: 1.2;
-        }
-
-        .node-cost {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: var(--gold);
-            background: rgba(255, 183, 3, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .node-status {
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: var(--accent);
-            text-transform: uppercase;
-        }
-
-        /* Admin Box */
-        .admin-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px 20px;
-            border: 1px solid var(--card-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .admin-input {
-            background: #0b0d12;
-            border: 1px solid var(--card-border);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .admin-btn {
-            background: #232a3b;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .admin-badge {
-            display: none;
-            color: #ef4444;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
+        /* Admin */
+        .admin-card { background: var(--card-bg); border-radius: 12px; padding: 15px 20px; border: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
+        .admin-card input { background: #0f131c; border: 1px solid var(--card-border); color: #fff; padding: 8px 12px; border-radius: 6px; outline: none; }
+        .admin-card button { background: #334155; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Top Stats Bar -->
     <div class="stats-bar">
-        <div class="stat-box">
-            <h3>Points</h3>
-            <p id="points-display">0</p>
-        </div>
-        <div class="stat-box">
-            <h3>Total Rolls</h3>
-            <p id="rolls-display">0</p>
-        </div>
-        <div class="stat-box">
-            <h3>Cooldown</h3>
-            <p id="cd-display">5m 00s</p>
-        </div>
+        <div class="stat-box"><h3>Total Score</h3><p id="ui-pts">0</p></div>
+        <div class="stat-box"><h3>Total Rolls</h3><p id="ui-rolls">0</p></div>
+        <div class="stat-box"><h3>Best Roll</h3><p id="ui-best">0</p></div>
     </div>
 
-    <!-- Generator / Scramble Section -->
     <div class="generator-card">
-        <div class="number-box" id="number-display">------</div>
-        <div class="rarity-tag" id="rarity-display" style="color: var(--subtext);">Click Generate to Roll</div>
+        <div class="number-box" id="number-display">?</div>
         
-        <button class="roll-btn" id="roll-btn" onclick="triggerRoll()">Generate Number</button>
-        <div class="timer-text" id="timer-display">Ready!</div>
+        <button class="roll-btn" id="btn-roll" onclick="startRollSequence()">Roll</button>
+        <div class="timer-text" id="cooldown-display">Ready to roll!</div>
+
+        <!-- Achievements will dynamically spawn here during a roll -->
+        <div class="achievements-container" id="achievements-container"></div>
+        <div class="final-banner" id="final-banner"></div>
     </div>
 
-    <!-- Upgrade Tree Section -->
     <div class="tree-section">
-        <h2 class="section-title">Upgrade Tree</h2>
-        
+        <div class="section-title">Upgrade Tree</div>
         <div class="tree-container" id="tree-container">
             <svg class="svg-lines" id="svg-lines"></svg>
-
-            <!-- Tier 0: Root -->
-            <div class="tree-tier">
-                <div class="tree-node" id="node-root" onclick="buyNode('root')">
-                    <div>
-                        <div class="node-title">Core Engine</div>
-                        <div class="node-desc">Unlocks the tree branches & grants +20% base points.</div>
-                    </div>
-                    <div class="node-cost" id="cost-root">10 Pts</div>
-                </div>
-            </div>
-
-            <!-- Tier 1: Branching (Luck, Time, Economy) -->
-            <div class="tree-tier">
-                <div class="tree-node" id="node-luck1" onclick="buyNode('luck1')">
-                    <div>
-                        <div class="node-title">Rare Tuning</div>
-                        <div class="node-desc">+50% higher chance to hit &lt;4 or 7 digit numbers.</div>
-                    </div>
-                    <div class="node-cost" id="cost-luck1">50 Pts</div>
-                </div>
-
-                <div class="tree-node" id="node-time1" onclick="buyNode('time1')">
-                    <div>
-                        <div class="node-title">Chrono Gear</div>
-                        <div class="node-desc">Reduces roll wait time by 1 Minute (4m cd).</div>
-                    </div>
-                    <div class="node-cost" id="cost-time1">75 Pts</div>
-                </div>
-
-                <div class="tree-node" id="node-econ1" onclick="buyNode('econ1')">
-                    <div>
-                        <div class="node-title">Point Multiplier</div>
-                        <div class="node-desc">Doubles (2x) point income from all rolls.</div>
-                    </div>
-                    <div class="node-cost" id="cost-econ1">60 Pts</div>
-                </div>
-            </div>
-
-            <!-- Tier 2: Advanced Unlocks -->
-            <div class="tree-tier">
-                <div class="tree-node" id="node-luck2" onclick="buyNode('luck2')">
-                    <div>
-                        <div class="node-title">1 & 2 Digit Finder</div>
-                        <div class="node-desc">3x Luck for ultra-rare 1-Digit and 2-Digit rolls!</div>
-                    </div>
-                    <div class="node-cost" id="cost-luck2">250 Pts</div>
-                </div>
-
-                <div class="tree-node" id="node-time2" onclick="buyNode('time2')">
-                    <div>
-                        <div class="node-title">Overclock Reveal</div>
-                        <div class="node-desc">Scramble reveal animation finishes 2x faster.</div>
-                    </div>
-                    <div class="node-cost" id="cost-time2">200 Pts</div>
-                </div>
-
-                <div class="tree-node" id="node-time3" onclick="buyNode('time3')">
-                    <div>
-                        <div class="node-title">Time Warp</div>
-                        <div class="node-desc">Reduces cooldown by another 2 minutes (2m cd).</div>
-                    </div>
-                    <div class="node-cost" id="cost-time3">500 Pts</div>
-                </div>
-
-                <div class="tree-node" id="node-econ2" onclick="buyNode('econ2')">
-                    <div>
-                        <div class="node-title">Jackpot Bonus</div>
-                        <div class="node-desc">5x Points on Mythic & Divine rolls (1, 2, 7 Digits).</div>
-                    </div>
-                    <div class="node-cost" id="cost-econ2">350 Pts</div>
-                </div>
-            </div>
-
-            <!-- Tier 3: Apex Singularity -->
-            <div class="tree-tier">
-                <div class="tree-node" id="node-apex" onclick="buyNode('apex')">
-                    <div>
-                        <div class="node-title">RNG Singularity</div>
-                        <div class="node-desc">15% chance for INSTANT ROLL REFUND + 3x Points!</div>
-                    </div>
-                    <div class="node-cost" id="cost-apex">1500 Pts</div>
-                </div>
-            </div>
+            <div class="tree-tier" id="tier-0"></div>
+            <div class="tree-tier" id="tier-1"></div>
+            <div class="tree-tier" id="tier-2"></div>
+            <div class="tree-tier" id="tier-3"></div>
         </div>
     </div>
 
-    <!-- Admin Section -->
     <div class="admin-card">
-        <div>
-            <span style="color: var(--subtext); font-size: 0.9rem;">Secret Code:</span>
-            <span class="admin-badge" id="admin-badge">ADMIN MODE ACTIVE (0s Cooldown)</span>
-        </div>
-        <div class="admin-input-group" id="admin-input-group">
-            <input type="password" id="admin-code" class="admin-input" placeholder="Enter secret code...">
-            <button class="admin-btn" onclick="checkAdmin()">Submit</button>
+        <div><span style="color:#94a3b8; font-size: 0.9rem;">Admin Code:</span></div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="admin-code" placeholder="Enter code...">
+            <button onclick="checkCode()">Submit</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SYMBOLS = ['@', '*', '$', ')', '^', '#', '%', '!', '&', '?', 'X', '9', '4', '7', '1', '8'];
+    /* =====================================================================
+       1. GAME STATE & SETTINGS
+       ===================================================================== */
+    let GAME = {
+        pts: 0,
+        rolls: 0,
+        best: 0,
+        upgrades: [],
+        cooldownReady: 0,
+        isRolling: false,
+    };
 
-    // --- Digit Outcome Pool ---
-    const DIGIT_TABLE = [
-        { digits: 1, weight: 0.05,  points: 100000, name: "MYTHIC (1 Digit)",    color: "#ff0055" },
-        { digits: 7, weight: 0.10,  points: 50000,  name: "DIVINE (7 Digits)",   color: "#00f2fe" },
-        { digits: 2, weight: 0.25,  points: 15000,  name: "LEGENDARY (2 Digits)",color: "#ffb703" },
-        { digits: 3, weight: 1.20,  points: 2500,   name: "EPIC (3 Digits)",     color: "#a855f7" },
-        { digits: 4, weight: 5.00,  points: 400,    name: "RARE (4 Digits)",     color: "#3b82f6" },
-        { digits: 5, weight: 15.00, points: 75,     name: "UNCOMMON (5 Digits)", color: "#10b981" },
-        { digits: 6, weight: 78.40, points: 10,     name: "COMMON (6 Digits)",   color: "#94a3b8" }
+    let baseCooldown = 8000; 
+    let rollInterval = null;
+
+    // Load from local storage
+    if (localStorage.getItem('rngdleAchieveSave')) {
+        let saved = JSON.parse(localStorage.getItem('rngdleAchieveSave'));
+        GAME = { ...GAME, ...saved };
+    }
+
+    /* =====================================================================
+       2. ACHIEVEMENT DEFINITIONS & LOGIC
+       ===================================================================== */
+    
+    // Helper to highlight specific indexes in a string
+    function highlightIndices(str, indicesArr) {
+        return str.split('').map((char, i) => 
+            indicesArr.includes(i) ? `<span class="hl">${char}</span>` : char
+        ).join('');
+    }
+
+    // Helper to return all indices 0 to length-1
+    function allIndices(len) { return Array.from({length: len}, (_, i) => i); }
+
+    const ACHIEVEMENTS = [
+        {
+            id: 'length7', name: '7 Digit Number', score: 7777777,
+            check: (s) => s.length === 7, getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'length6', name: '6 Digit Number', score: 66,
+            check: (s) => s.length === 6, getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'length5', name: '5 Digit Number', score: 55555,
+            check: (s) => s.length === 5, getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'length4', name: '4 Digit Number', score: 4444,
+            check: (s) => s.length === 4, getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'length3', name: '3 Digit Number', score: 333,
+            check: (s) => s.length === 3, getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'length2', name: '2 Digit Number', score: 22,
+            check: (s) => s.length === 2, getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'length1', name: '1 Digit Number', score: 1,
+            check: (s) => s.length === 1, getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'even', name: 'Even Number', score: 2,
+            check: (s) => parseInt(s[s.length-1]) % 2 === 0, 
+            getHtml: (s) => highlightIndices(s, [s.length-1])
+        },
+        {
+            id: 'odd', name: 'Odd Number', score: 1,
+            check: (s) => parseInt(s[s.length-1]) % 2 !== 0, 
+            getHtml: (s) => highlightIndices(s, [s.length-1])
+        },
+        {
+            id: 'void', name: 'Void', score: 404,
+            check: (s) => !s.includes('0'), 
+            getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'neighbours', name: 'Neighbours', score: 12,
+            check: (s) => s.length >= 2 && s.split('').some((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1),
+            getHtml: (s) => {
+                let idx = s.split('').findIndex((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1);
+                return highlightIndices(s, [idx, idx+1]);
+            }
+        },
+        {
+            id: 'consecDoublePair', name: 'Consecutive Double Pair', score: 1122,
+            check: (s) => /(.)\1(?!\1)(.)\2/.test(s),
+            getHtml: (s) => {
+                let match = s.match(/(.)\1(?!\1)(.)\2/);
+                return highlightIndices(s, [match.index, match.index+1, match.index+2, match.index+3]);
+            }
+        },
+        {
+            id: 'doublePair', name: 'Double Pair', score: 2222,
+            check: (s) => {
+                let counts = {};
+                for(let c of s) counts[c] = (counts[c]||0)+1;
+                return Object.values(counts).filter(v => v >= 2).length >= 2;
+            },
+            getHtml: (s) => {
+                let counts = {};
+                for(let c of s) counts[c] = (counts[c]||0)+1;
+                let pairs = Object.keys(counts).filter(k => counts[k] >= 2).slice(0, 2);
+                let indices = [];
+                s.split('').forEach((c, i) => { if(pairs.includes(c)) indices.push(i); });
+                return highlightIndices(s, indices);
+            }
+        },
+        {
+            id: 'consecPair', name: 'Consecutive Pair', score: 11,
+            check: (s) => /(.)\1/.test(s),
+            getHtml: (s) => {
+                let match = s.match(/(.)\1/);
+                return highlightIndices(s, [match.index, match.index+1]);
+            }
+        },
+        {
+            id: 'pair', name: 'Pair', score: 22,
+            check: (s) => new Set(s).size < s.length,
+            getHtml: (s) => {
+                let counts = {};
+                for(let c of s) counts[c] = (counts[c]||0)+1;
+                let pairChar = Object.keys(counts).find(k => counts[k] >= 2);
+                let indices = [];
+                s.split('').forEach((c, i) => { if(c === pairChar) indices.push(i); });
+                return highlightIndices(s, indices);
+            }
+        },
+        {
+            id: 'luckySevens', name: 'Lucky Sevens', score: 777,
+            check: (s) => s.includes('77'),
+            getHtml: (s) => {
+                let idx = s.indexOf('77');
+                return highlightIndices(s, [idx, idx+1]);
+            }
+        },
+        {
+            id: 'sevens', name: "7's", score: 77,
+            check: (s) => (s.match(/7/g) || []).length >= 2,
+            getHtml: (s) => {
+                let indices = [];
+                s.split('').forEach((c, i) => { if(c === '7') indices.push(i); });
+                return highlightIndices(s, indices);
+            }
+        },
+        {
+            id: 'lowBall', name: 'Low Ball', score: 123,
+            check: (s) => /^[0-4]+$/.test(s),
+            getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'highRoll', name: 'High Roll', score: 789,
+            check: (s) => /^[5-9]+$/.test(s),
+            getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'heterogeneous', name: 'Heterogeneous', score: 1234,
+            check: (s) => new Set(s).size === s.length && s.length > 1,
+            getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'lucky7', name: 'Lucky 7', score: 7,
+            check: (s) => Number(s) % 7 === 0 && Number(s) > 0,
+            getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'runner', name: 'Runner', score: 123,
+            check: (s) => s.length >= 3 && s.split('').some((c, i) => 
+                i < s.length-2 && 
+                parseInt(s[i+1]) === parseInt(c)+1 && 
+                parseInt(s[i+2]) === parseInt(c)+2
+            ),
+            getHtml: (s) => {
+                let idx = s.split('').findIndex((c, i) => i < s.length-2 && parseInt(s[i+1]) === parseInt(c)+1 && parseInt(s[i+2]) === parseInt(c)+2);
+                return highlightIndices(s, [idx, idx+1, idx+2]);
+            }
+        },
+        {
+            id: 'pocketMirror', name: 'Pocket Mirror', score: 5665,
+            check: (s) => {
+                if(s.length < 3) return false;
+                for(let i=0; i<s.length-2; i++) {
+                    if (s[i] === s[i+2]) return true; // 3 length (e.g. 181)
+                    if (i<s.length-3 && s[i] === s[i+3] && s[i+1] === s[i+2]) return true; // 4 length (e.g. 1881)
+                }
+                return false;
+            },
+            getHtml: (s) => {
+                for(let i=0; i<s.length-3; i++) { // Check 4 length first
+                    if (s[i] === s[i+3] && s[i+1] === s[i+2]) return highlightIndices(s, [i, i+1, i+2, i+3]);
+                }
+                for(let i=0; i<s.length-2; i++) { // Then 3 length
+                    if (s[i] === s[i+2]) return highlightIndices(s, [i, i+1, i+2]);
+                }
+                return s;
+            }
+        },
+        {
+            id: 'mirror', name: 'Mirror', score: 8008,
+            check: (s) => s.length > 1 && s === s.split('').reverse().join(''),
+            getHtml: (s) => highlightIndices(s, allIndices(s.length))
+        },
+        {
+            id: 'translucent', name: 'Translucent', score: 1001,
+            check: (s) => s.length >= 2 && s.startsWith('0') && s.endsWith('0'),
+            getHtml: (s) => highlightIndices(s, [0, s.length-1])
+        },
+        {
+            id: 'century', name: 'Century', score: 100,
+            check: (s) => s.length >= 2 && s.endsWith('00'),
+            getHtml: (s) => highlightIndices(s, [s.length-2, s.length-1])
+        }
     ];
 
-    // --- Upgrade Tree Database ---
-    const TREE = {
-        'root':  { cost: 10,   bought: false, requires: [] },
-        'luck1': { cost: 50,   bought: false, requires: ['root'] },
-        'time1': { cost: 75,   bought: false, requires: ['root'] },
-        'econ1': { cost: 60,   bought: false, requires: ['root'] },
-        'luck2': { cost: 250,  bought: false, requires: ['luck1'] },
-        'time2': { cost: 200,  bought: false, requires: ['time1'] },
-        'time3': { cost: 500,  bought: false, requires: ['time1'] },
-        'econ2': { cost: 350,  bought: false, requires: ['econ1'] },
-        'apex':  { cost: 1500, bought: false, requires: ['luck2', 'econ2'] }
-    };
+    /* =====================================================================
+       3. UPGRADE TREE
+       ===================================================================== */
+    const TREE = [
+        { id: "root", title: "Core Engine", desc: "+20% Base Points", cost: 0, req: [], tier: 0 },
+        
+        { id: "luck1", title: "RNG Manipulator", desc: "Slightly increased chance for rare string lengths", cost: 50, req: ["root"], tier: 1 },
+        { id: "time1", title: "Clockwork I", desc: "-1.5s Cooldown", cost: 100, req: ["root"], tier: 1 },
+        { id: "pts1", title: "Score Multiplier", desc: "+50% points from Achievements", cost: 150, req: ["root"], tier: 1 },
+        
+        { id: "luck2", title: "Anomaly", desc: "Huge boost to 7-digit and 1-digit lengths", cost: 500, req: ["luck1"], tier: 2 },
+        { id: "time2", title: "Clockwork II", desc: "-2s Cooldown", cost: 800, req: ["time1"], tier: 2 },
+        { id: "pts2", title: "Combo Master", desc: "2x points if total base score > 1000", cost: 1200, req: ["pts1"], tier: 2 },
+        
+        { id: "apex", title: "Apex System", desc: "-3s CD & +100% Points", cost: 5000, req: ["luck2", "time2", "pts2"], tier: 3 }
+    ];
 
-    // --- State ---
-    let state = {
-        points: 0,
-        rolls: 0,
-        lastRollTime: 0,
-        isAdmin: false,
-        isRolling: false
-    };
+    /* =====================================================================
+       4. GENERATION LOGIC & ANIMATION
+       ===================================================================== */
+    
+    function determineLength() {
+        let max = 1000;
+        let r = Math.random() * max;
+        
+        let w = { l6: 500, l5: 250, l4: 150, l3: 70, l2: 20, l1: 8, l7: 2 };
+        if (GAME.upgrades.includes("luck1")) { w.l3 += 30; w.l2 += 30; w.l1 += 20; w.l7 += 8; }
+        if (GAME.upgrades.includes("luck2")) { w.l1 += 100; w.l7 += 40; w.l2 += 50; }
 
-    // --- Game Logic Helpers ---
-    function getCooldownSeconds() {
-        if (state.isAdmin) return 0;
-        let cd = 300; // 5 minutes standard (300s)
-        if (TREE.time1.bought) cd -= 60; // 4m
-        if (TREE.time3.bought) cd -= 120; // 2m
-        return Math.max(0, cd);
+        let totalWeight = Object.values(w).reduce((a, b) => a + b, 0);
+        r = (r / max) * totalWeight;
+
+        if (r < w.l6) return 6; r -= w.l6;
+        if (r < w.l5) return 5; r -= w.l5;
+        if (r < w.l4) return 4; r -= w.l4;
+        if (r < w.l3) return 3; r -= w.l3;
+        if (r < w.l2) return 2; r -= w.l2;
+        if (r < w.l1) return 1;
+        return 7;
     }
 
-    function canRoll() {
-        if (state.isRolling) return false;
-        if (state.isAdmin) return true;
-        const elapsed = (Date.now() - state.lastRollTime) / 1000;
-        return elapsed >= getCooldownSeconds();
+    function generateNumber(length) {
+        let res = "";
+        for (let i = 0; i < length; i++) {
+            res += Math.floor(Math.random() * 10).toString();
+        }
+        return res;
     }
 
-    // --- Roll Generator Engine ---
-    function triggerRoll() {
-        if (!canRoll()) return;
-
-        state.isRolling = true;
-        state.rolls++;
-        state.lastRollTime = Date.now();
-
-        // 1. Calculate Weights with Upgrade Tree Modifiers
-        let weights = DIGIT_TABLE.map(item => {
-            let w = item.weight;
-            if (TREE.luck1.bought && (item.digits < 4 || item.digits === 7)) {
-                w *= 1.5;
+    function startRollSequence() {
+        if (GAME.isRolling || Date.now() < GAME.cooldownReady) return;
+        GAME.isRolling = true;
+        
+        document.getElementById("btn-roll").disabled = true;
+        document.getElementById("btn-roll").innerText = "Rolling...";
+        
+        // Clear previous results
+        document.getElementById("achievements-container").innerHTML = "";
+        document.getElementById("final-banner").style.opacity = "0";
+        
+        let targetLen = determineLength();
+        let targetStr = generateNumber(targetLen);
+        
+        // Slower scramble animation
+        let display = document.getElementById("number-display");
+        let cycles = 0;
+        let maxCycles = 15 + (targetLen * 2); // Scales with length
+        let lockedStr = "";
+        
+        let scrambleTimer = setInterval(() => {
+            cycles++;
+            let tempStr = lockedStr;
+            let remainingLen = targetLen - lockedStr.length;
+            
+            for(let i=0; i<remainingLen; i++) {
+                tempStr += Math.floor(Math.random() * 10);
             }
-            if (TREE.luck2.bought && (item.digits === 1 || item.digits === 2)) {
-                w *= 3.0;
+            display.innerText = tempStr;
+
+            // Lock in a character slowly
+            if (cycles % 4 === 0 && lockedStr.length < targetLen) {
+                lockedStr += targetStr[lockedStr.length];
             }
-            return w;
+
+            if (lockedStr.length === targetLen) {
+                clearInterval(scrambleTimer);
+                display.innerText = targetStr;
+                processNumber(targetStr);
+            }
+        }, 80); // 80ms per tick
+    }
+
+    /* =====================================================================
+       5. ACHIEVEMENT PROCESSING & DISPLAY
+       ===================================================================== */
+    
+    function processNumber(numStr) {
+        let earned = [];
+        
+        // Important rule filters: Double pair and Consec double override standard pair/consec
+        let matchedIds = [];
+
+        ACHIEVEMENTS.forEach(ach => {
+            if (ach.check(numStr)) {
+                earned.push({ ...ach, html: ach.getHtml(numStr) });
+                matchedIds.push(ach.id);
+            }
         });
 
-        // 2. Roll Weighted Probability
-        let totalWeight = weights.reduce((a, b) => a + b, 0);
-        let rand = Math.random() * totalWeight;
-        let selectedOutcome = DIGIT_TABLE[DIGIT_TABLE.length - 1]; // Fallback to 6 digits
-
-        for (let i = 0; i < DIGIT_TABLE.length; i++) {
-            if (rand < weights[i]) {
-                selectedOutcome = DIGIT_TABLE[i];
-                break;
-            }
-            rand -= weights[i];
+        // Filter out redundancies based on rules
+        if (matchedIds.includes("consecDoublePair")) {
+            earned = earned.filter(a => a.id !== "consecPair" && a.id !== "pair" && a.id !== "doublePair");
+        } else if (matchedIds.includes("doublePair")) {
+            earned = earned.filter(a => a.id !== "pair");
+        } else if (matchedIds.includes("consecPair")) {
+            earned = earned.filter(a => a.id !== "pair");
+        }
+        if (matchedIds.includes("luckySevens")) {
+            earned = earned.filter(a => a.id !== "sevens");
+        }
+        if (matchedIds.includes("mirror")) {
+            earned = earned.filter(a => a.id !== "pocketMirror");
         }
 
-        // 3. Generate Random Digits String
-        let resultStr = "";
-        for (let i = 0; i < selectedOutcome.digits; i++) {
-            if (i === 0) {
-                resultStr += Math.floor(Math.random() * 9 + 1); // No leading zero
+        // Display slowly
+        displayAchievementsSlowly(earned, numStr);
+    }
+
+    function displayAchievementsSlowly(earnedArr, numStr) {
+        let container = document.getElementById("achievements-container");
+        let idx = 0;
+        let totalBaseScore = 0;
+
+        function showNext() {
+            if (idx < earnedArr.length) {
+                let ach = earnedArr[idx];
+                totalBaseScore += ach.score;
+
+                let div = document.createElement("div");
+                div.className = "achievement-card";
+                div.innerHTML = `
+                    <div class="ach-info">
+                        <span class="ach-name">${ach.name}</span>
+                        <span class="ach-score">${ach.score.toLocaleString()} pts</span>
+                    </div>
+                    <div class="ach-num-display">${ach.html}</div>
+                `;
+                container.appendChild(div);
+                
+                // Scroll if needed
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+                idx++;
+                setTimeout(showNext, 600); // 600ms delay between achievements
             } else {
-                resultStr += Math.floor(Math.random() * 10);
+                finalizeRoll(totalBaseScore);
             }
         }
-
-        // 4. Apex Refund Roll Check
-        if (TREE.apex.bought && Math.random() < 0.15) {
-            state.lastRollTime = 0; // Instant cooldown refund!
-        }
-
-        // 5. Scramble Animation
-        playScramble(resultStr, selectedOutcome);
-    }
-
-    function playScramble(targetStr, outcome) {
-        const display = document.getElementById('number-display');
-        const rarityDisplay = document.getElementById('rarity-display');
-
-        rarityDisplay.innerText = "Revealing...";
-        rarityDisplay.style.color = "var(--subtext)";
-
-        let len = targetStr.length;
-        let revealedCount = 0;
-        let ticks = 0;
         
-        // Speed up scramble if time2 node is bought
-        let ticksPerDigit = TREE.time2.bought ? 2 : 5; 
-        let speedMs = TREE.time2.bought ? 30 : 50;
-
-        const interval = setInterval(() => {
-            ticks++;
-            let scrambleStr = "";
-
-            for (let i = 0; i < len; i++) {
-                if (i < revealedCount) {
-                    scrambleStr += targetStr[i];
-                } else {
-                    scrambleStr += SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-                }
-            }
-
-            display.innerText = scrambleStr;
-
-            if (ticks % ticksPerDigit === 0) {
-                revealedCount++;
-            }
-
-            if (revealedCount > len) {
-                clearInterval(interval);
-                display.innerText = targetStr;
-
-                // Points Calculations
-                let basePts = outcome.points;
-                let multiplier = 1.0;
-
-                if (TREE.root.bought) multiplier += 0.2;
-                if (TREE.econ1.bought) multiplier *= 2.0;
-                if (TREE.econ2.bought && (outcome.digits === 1 || outcome.digits === 2 || outcome.digits === 7)) {
-                    multiplier *= 5.0;
-                }
-                if (TREE.apex.bought) multiplier *= 3.0;
-
-                let totalPts = Math.floor(basePts * multiplier);
-                state.points += totalPts;
-
-                // UI Display
-                rarityDisplay.innerText = `${outcome.name} | +${totalPts.toLocaleString()} Pts`;
-                rarityDisplay.style.color = outcome.color;
-
-                state.isRolling = false;
-                updateUI();
-            }
-        }, speedMs);
+        setTimeout(showNext, 400);
     }
 
-    // --- Upgrade Tree Actions ---
-    function isNodeUnlocked(key) {
-        const node = TREE[key];
-        if (node.requires.length === 0) return true;
-        return node.requires.every(reqKey => TREE[reqKey].bought);
+    function finalizeRoll(baseScore) {
+        let finalScore = baseScore;
+
+        // Apply Multipliers
+        let mult = 1;
+        if (GAME.upgrades.includes("root")) mult += 0.2;
+        if (GAME.upgrades.includes("pts1")) mult += 0.5;
+        if (GAME.upgrades.includes("apex")) mult += 1.0;
+        
+        finalScore = Math.floor(finalScore * mult);
+        if (GAME.upgrades.includes("pts2") && baseScore > 1000) finalScore *= 2;
+
+        GAME.pts += finalScore;
+        GAME.rolls++;
+        if (finalScore > GAME.best) GAME.best = finalScore;
+
+        updateUI();
+
+        // Rarity Banner
+        let banner = document.getElementById("final-banner");
+        let rarityText, tierClass;
+        
+        if (finalScore > 100000) { rarityText = "MYTHIC"; tierClass = "tier-mythic"; }
+        else if (finalScore > 10000) { rarityText = "LEGENDARY"; tierClass = "tier-legendary"; }
+        else if (finalScore > 2000) { rarityText = "EPIC"; tierClass = "tier-epic"; }
+        else if (finalScore > 500) { rarityText = "RARE"; tierClass = "tier-rare"; }
+        else { rarityText = "COMMON"; tierClass = "tier-common"; }
+
+        banner.innerText = `${rarityText} ROLL! (+${finalScore.toLocaleString()} pts)`;
+        banner.className = `final-banner ${tierClass}`;
+        banner.style.opacity = "1";
+
+        // Cooldown
+        let cd = baseCooldown;
+        if (GAME.upgrades.includes("time1")) cd -= 1500;
+        if (GAME.upgrades.includes("time2")) cd -= 2000;
+        if (GAME.upgrades.includes("apex")) cd -= 3000;
+        
+        GAME.cooldownReady = Date.now() + cd;
+        GAME.isRolling = false;
+        saveGame();
     }
 
-    function buyNode(key) {
-        const node = TREE[key];
-        if (node.bought) return;
-        if (!isNodeUnlocked(key)) return;
-
-        if (state.points >= node.cost) {
-            state.points -= node.cost;
-            node.bought = true;
-            updateUI();
-            drawTreeLines();
-        }
+    /* =====================================================================
+       6. UI & TIMERS
+       ===================================================================== */
+    
+    function updateUI() {
+        document.getElementById("ui-pts").innerText = GAME.pts.toLocaleString();
+        document.getElementById("ui-rolls").innerText = GAME.rolls;
+        document.getElementById("ui-best").innerText = GAME.best.toLocaleString();
+        renderTree();
     }
 
-    // --- Admin Secret Code ---
-    function checkAdmin() {
-        const code = document.getElementById('admin-code').value.trim();
-        if (code.toLowerCase() === 'admin') {
-            state.isAdmin = true;
-            document.getElementById('admin-badge').style.display = 'inline-block';
-            document.getElementById('admin-input-group').style.display = 'none';
-            updateUI();
+    setInterval(() => {
+        let btn = document.getElementById("btn-roll");
+        let txt = document.getElementById("cooldown-display");
+        
+        if (GAME.isRolling) return; // Managed by rolling func
+        
+        let now = Date.now();
+        if (now >= GAME.cooldownReady) {
+            btn.disabled = false;
+            btn.innerText = "ROLL";
+            txt.innerText = "Ready to roll!";
         } else {
-            alert("Invalid Code");
+            btn.disabled = true;
+            let left = ((GAME.cooldownReady - now) / 1000).toFixed(1);
+            btn.innerText = `WAIT (${left}s)`;
+            txt.innerText = "Cooling down...";
+        }
+    }, 100);
+
+    /* =====================================================================
+       7. UPGRADE TREE RENDERING (Same layout logic as before)
+       ===================================================================== */
+    
+    function canBuy(node) {
+        if (GAME.upgrades.includes(node.id)) return false;
+        if (node.req.length === 0) return true;
+        return node.req.every(reqId => GAME.upgrades.includes(reqId));
+    }
+
+    function buyUpgrade(id) {
+        let node = TREE.find(n => n.id === id);
+        if (canBuy(node) && GAME.pts >= node.cost) {
+            GAME.pts -= node.cost;
+            GAME.upgrades.push(id);
+            updateUI();
+            saveGame();
+            if (id === 'root') { // Instantly unlock root free
+                document.getElementById('achievements-container').innerHTML = "<div style='color:var(--gold);'>Core Engine Initialized. RNG systems online.</div>";
+            }
         }
     }
 
-    // --- Dynamic SVG Tree Connectors ---
-    function drawTreeLines() {
-        const svg = document.getElementById('svg-lines');
-        const container = document.getElementById('tree-container');
-        const cRect = container.getBoundingClientRect();
+    function renderTree() {
+        [0, 1, 2, 3].forEach(tier => { document.getElementById(`tier-${tier}`).innerHTML = ""; });
 
-        svg.innerHTML = ''; // Clear lines
+        TREE.forEach(node => {
+            let el = document.createElement("div");
+            let isBought = GAME.upgrades.includes(node.id);
+            let isUnlocked = canBuy(node);
+            
+            el.className = `tree-node ${isBought ? 'bought' : isUnlocked ? 'unlocked' : 'locked'}`;
+            el.id = `node-${node.id}`;
+            
+            el.innerHTML = `
+                <div class="node-title">${node.title}</div>
+                <div class="node-desc">${node.desc}</div>
+                <div class="node-cost">${isBought ? 'BOUGHT' : node.cost.toLocaleString() + ' pts'}</div>
+            `;
+            
+            if (isUnlocked && GAME.pts >= node.cost) {
+                el.onclick = () => buyUpgrade(node.id);
+            }
 
-        Object.keys(TREE).forEach(childKey => {
-            const childNode = TREE[childKey];
-            childNode.requires.forEach(parentKey => {
-                const pElem = document.getElementById(`node-${parentKey}`);
-                const cElem = document.getElementById(`node-${childKey}`);
+            document.getElementById(`tier-${node.tier}`).appendChild(el);
+        });
+        
+        setTimeout(drawLines, 50); // slight delay to let DOM render sizes
+    }
 
-                if (!pElem || !cElem) return;
+    function drawLines() {
+        let svg = document.getElementById("svg-lines");
+        svg.innerHTML = "";
+        let containerRect = document.getElementById("tree-container").getBoundingClientRect();
 
-                const pRect = pElem.getBoundingClientRect();
-                const cRect2 = cElem.getBoundingClientRect();
+        TREE.forEach(node => {
+            node.req.forEach(reqId => {
+                let el1 = document.getElementById(`node-${reqId}`);
+                let el2 = document.getElementById(`node-${node.id}`);
+                
+                if (el1 && el2) {
+                    let r1 = el1.getBoundingClientRect();
+                    let r2 = el2.getBoundingClientRect();
 
-                // Compute centers relative to tree-container
-                const x1 = pRect.left + pRect.width / 2 - cRect.left;
-                const y1 = pRect.top + pRect.height / 2 - cRect.top;
-                const x2 = cRect2.left + cRect2.width / 2 - cRect.left;
-                const y2 = cRect2.top + cRect2.height / 2 - cRect.top;
+                    let x1 = r1.left + r1.width / 2 - containerRect.left;
+                    let y1 = r1.bottom - containerRect.top;
+                    let x2 = r2.left + r2.width / 2 - containerRect.left;
+                    let y2 = r2.top - containerRect.top;
 
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x1);
-                line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
+                    let isUnlocked = GAME.upgrades.includes(node.id) || canBuy(node);
+                    let color = isUnlocked ? "var(--accent)" : "var(--locked)";
+                    let width = isUnlocked ? 3 : 2;
 
-                const parentBought = TREE[parentKey].bought;
-                const childBought = TREE[childKey].bought;
-
-                if (childBought) {
-                    line.setAttribute('stroke', '#ffb703');
-                    line.setAttribute('stroke-width', '3');
-                } else if (parentBought) {
-                    line.setAttribute('stroke', '#00f2fe');
-                    line.setAttribute('stroke-width', '2');
-                } else {
-                    line.setAttribute('stroke', '#334155');
-                    line.setAttribute('stroke-width', '1.5');
-                    line.setAttribute('stroke-dasharray', '4');
+                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", x1);
+                    line.setAttribute("y1", y1);
+                    line.setAttribute("x2", x2);
+                    line.setAttribute("y2", y2);
+                    line.setAttribute("stroke", color);
+                    line.setAttribute("stroke-width", width);
+                    svg.appendChild(line);
                 }
-
-                svg.appendChild(line);
             });
         });
     }
 
-    // --- UI Render ---
-    function updateUI() {
-        document.getElementById('points-display').innerText = Math.floor(state.points).toLocaleString();
-        document.getElementById('rolls-display').innerText = state.rolls.toLocaleString();
+    window.addEventListener("resize", drawLines);
 
-        const cdSecs = getCooldownSeconds();
-        const mins = Math.floor(cdSecs / 60);
-        const secs = cdSecs % 60;
-        document.getElementById('cd-display').innerText = state.isAdmin ? '0s (Admin)' : `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
-
-        // Update Nodes
-        Object.keys(TREE).forEach(key => {
-            const node = TREE[key];
-            const elem = document.getElementById(`node-${key}`);
-            const costElem = document.getElementById(`cost-${key}`);
-            const unlocked = isNodeUnlocked(key);
-
-            elem.className = 'tree-node';
-            if (node.bought) {
-                elem.classList.add('bought');
-                costElem.innerHTML = `<span class="node-status">Purchased</span>`;
-            } else if (unlocked) {
-                elem.classList.add('unlocked');
-                costElem.innerText = `${node.cost} Pts`;
-                if (state.points < node.cost) {
-                    elem.style.opacity = '0.7';
-                } else {
-                    elem.style.opacity = '1';
-                }
-            } else {
-                elem.classList.add('locked');
-                costElem.innerText = `Locked`;
-            }
-        });
-
-        drawTreeLines();
+    function saveGame() {
+        localStorage.setItem('rngdleAchieveSave', JSON.stringify({
+            pts: GAME.pts, rolls: GAME.rolls, best: GAME.best, upgrades: GAME.upgrades
+        }));
     }
 
-    function updateTimer() {
-        const btn = document.getElementById('roll-btn');
-        const timerDisplay = document.getElementById('timer-display');
-
-        if (state.isRolling) {
-            btn.disabled = true;
-            timerDisplay.innerText = "Rolling...";
-            return;
-        }
-
-        if (canRoll()) {
-            btn.disabled = false;
-            timerDisplay.innerText = state.isAdmin ? "ADMIN MODE: Unlimited Rolls!" : "Ready to Roll!";
-            timerDisplay.style.color = "#10b981";
-        } else {
-            btn.disabled = true;
-            const remaining = getCooldownSeconds() - Math.floor((Date.now() - state.lastRollTime) / 1000);
-            const mins = Math.floor(remaining / 60);
-            const secs = remaining % 60;
-            timerDisplay.innerText = `Next Roll in: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
-            timerDisplay.style.color = "var(--subtext)";
+    function checkCode() {
+        let code = document.getElementById("admin-code").value;
+        if (code === "motherlode") {
+            GAME.pts += 50000;
+            document.getElementById("admin-code").value = "";
+            updateUI();
+            saveGame();
+        } else if (code === "reset") {
+            localStorage.removeItem('rngdleAchieveSave');
+            location.reload();
         }
     }
 
-    // Interval Loops
-    setInterval(updateTimer, 100);
-    window.addEventListener('resize', drawTreeLines);
-
-    // Initial setup
+    // Init
     updateUI();
-    setTimeout(drawTreeLines, 100);
 </script>
+
 </body>
 </html>
