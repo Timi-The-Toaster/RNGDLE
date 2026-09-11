@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNGdle - Upgrade Tree</title>
+    <style>
+        :root {
+            --bg-color: #0f0f12;
+            --card-bg: #1a1a24;
+            --accent: #7289da;
+            --accent-gold: #f1c40f;
+            --text-color: #ffffff;
+            --subtext: #a0a0b0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Header Stats */
+        .stats-bar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            border: 1px solid #2a2a3a;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .stat-box h3 {
+            font-size: 0.9rem;
+            color: var(--subtext);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-box p {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-top: 5px;
+        }
+
+        /* Roll Area */
+        .roll-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid #2a2a3a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .result-display {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .rarity-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .rarity-chance {
+            font-size: 1.1rem;
+            color: var(--subtext);
+            margin-top: 5px;
+        }
+
+        .roll-btn {
+            background: linear-gradient(135deg, #4752c4, #7289da);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(114, 137, 218, 0.4);
+        }
+
+        .roll-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(114, 137, 218, 0.6);
+        }
+
+        .roll-btn:disabled {
+            background: #3a3a4c;
+            color: #7a7a8c;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .timer-display {
+            font-size: 1.1rem;
+            color: var(--subtext);
+        }
+
+        /* Upgrade Tree */
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .upgrades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .upgrade-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2a3a;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .upgrade-info h4 {
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .upgrade-info p {
+            font-size: 0.85rem;
+            color: var(--subtext);
+            margin-top: 4px;
+        }
+
+        .buy-btn {
+            background: #2b2b3c;
+            border: 1px solid var(--accent);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            background: var(--accent);
+        }
+
+        .buy-btn:disabled {
+            border-color: #3a3a4c;
+            color: #5a5a6c;
+            cursor: not-allowed;
+        }
+
+        /* Footer & Admin Secret */
+        .admin-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #2a2a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .admin-input {
+            background: #0f0f12;
+            border: 1px solid #3a3a4c;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .admin-btn {
+            background: #3a3a4c;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .admin-badge {
+            display: none;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Top Stats -->
+    <div class="stats-bar">
+        <div class="stat-box">
+            <h3>Points</h3>
+            <p id="points-display">0</p>
+        </div>
+        <div class="stat-box">
+            <h3>Total Rolls</h3>
+            <p id="rolls-display">0</p>
+        </div>
+        <div class="stat-box">
+            <h3>Luck Multiplier</h3>
+            <p id="luck-display">1.0x</p>
+        </div>
+    </div>
+
+    <!-- Main Roll Area -->
+    <div class="roll-section">
+        <div class="result-display" id="result-display">
+            <div class="rarity-title" style="color: #a0a0a0;">Ready to Roll</div>
+            <div class="rarity-chance">Press the button below to test your luck!</div>
+        </div>
+
+        <button class="roll-btn" id="roll-btn" onclick="roll()">ROLL</button>
+        <div class="timer-display" id="timer-display">Ready!</div>
+    </div>
+
+    <!-- Upgrade Tree -->
+    <h2 class="section-title">Upgrade Tree</h2>
+    <div class="upgrades-grid">
+        <!-- Upgrade 1: Luck -->
+        <div class="upgrade-card">
+            <div class="upgrade-info">
+                <h4>Luck Boost</h4>
+                <p>Increases your chance of rolling rare items.</p>
+                <p>Current: <span id="luck-level-text">+0%</span></p>
+            </div>
+            <button class="buy-btn" id="buy-luck" onclick="buyUpgrade('luck')">
+                Upgrade (<span id="luck-cost">50</span> pts)
+            </button>
+        </div>
+
+        <!-- Upgrade 2: Point Multiplier -->
+        <div class="upgrade-card">
+            <div class="upgrade-info">
+                <h4>Point Doubler</h4>
+                <p>Increases points gained from every roll.</p>
+                <p>Current: <span id="points-level-text">1.0x</span></p>
+            </div>
+            <button class="buy-btn" id="buy-points" onclick="buyUpgrade('points')">
+                Upgrade (<span id="points-cost">100</span> pts)
+            </button>
+        </div>
+
+        <!-- Upgrade 3: Cooldown Reducer -->
+        <div class="upgrade-card">
+            <div class="upgrade-info">
+                <h4>Chrono Shift</h4>
+                <p>Reduces roll cooldown by 30s per level (Min 10s).</p>
+                <p>Current: <span id="cooldown-level-text">5m 00s</span></p>
+            </div>
+            <button class="buy-btn" id="buy-cooldown" onclick="buyUpgrade('cooldown')">
+                Upgrade (<span id="cooldown-cost">200</span> pts)
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Secret Section -->
+    <div class="admin-section">
+        <div>
+            <span style="color: var(--subtext); font-size: 0.9rem;">Secret Admin Code:</span>
+            <span class="admin-badge" id="admin-badge">ADMIN MODE ACTIVE (0s Cooldown)</span>
+        </div>
+        <div class="admin-input-group" id="admin-input-group">
+            <input type="password" id="admin-code" class="admin-input" placeholder="Enter code...">
+            <button class="admin-btn" onclick="checkAdmin()">Submit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Rarity Table (Rarest to Commonest) ---
+    const RARITIES = [
+        { name: "GODLY", chance: 1000000, points: 5000000, color: "#ffffff" },
+        { name: "Celestial", chance: 100000, points: 500000, color: "#ff77ff" },
+        { name: "Divine", chance: 25000, points: 100000, color: "#ffff55" },
+        { name: "Exotic", chance: 5000, points: 15000, color: "#00ffff" },
+        { name: "Mythic", chance: 1000, points: 2500, color: "#ff5555" },
+        { name: "Legendary", chance: 250, points: 500, color: "#ffaa00" },
+        { name: "Epic", chance: 50, points: 100, color: "#aa00aa" },
+        { name: "Rare", chance: 15, points: 30, color: "#5555ff" },
+        { name: "Uncommon", chance: 4, points: 10, color: "#55ff55" },
+        { name: "Common", chance: 1, points: 2, color: "#a0a0a0" }
+    ];
+
+    // --- Game State ---
+    let state = {
+        points: 0,
+        rolls: 0,
+        lastRollTime: 0,
+        isAdmin: false,
+        upgrades: {
+            luck: { level: 0, baseCost: 50, costMult: 2 },
+            points: { level: 0, baseCost: 100, costMult: 2.5 },
+            cooldown: { level: 0, baseCost: 200, costMult: 3 }
+        }
+    };
+
+    // --- Core Gameplay Functions ---
+
+    function getLuckMultiplier() {
+        return 1 + (state.upgrades.luck.level * 0.25); // +25% luck per level
+    }
+
+    function getPointMultiplier() {
+        return 1 + (state.upgrades.points.level * 0.5); // +50% points per level
+    }
+
+    function getCooldownSeconds() {
+        if (state.isAdmin) return 0; // Admin mode removes cooldown
+        let cd = 300 - (state.upgrades.cooldown.level * 30); // Base 300s (5m), -30s per level
+        return Math.max(10, cd); // Minimum 10 seconds standard
+    }
+
+    function roll() {
+        if (!canRoll()) return;
+
+        state.rolls++;
+        state.lastRollTime = Date.now();
+
+        // Roll Math with Luck
+        const luck = getLuckMultiplier();
+        let rolledRarity = RARITIES[RARITIES.length - 1]; // Default to Common
+
+        for (let r of RARITIES) {
+            // Chance threshold = 1 / (rarity.chance / luck)
+            let chanceThreshold = luck / r.chance;
+            if (Math.random() < chanceThreshold) {
+                rolledRarity = r;
+                break; // Got the rarest possible roll in descending order
+            }
+        }
+
+        // Points calculation
+        const earnedPoints = Math.floor(rolledRarity.points * getPointMultiplier());
+        state.points += earnedPoints;
+
+        // Display result
+        const resultDisplay = document.getElementById('result-display');
+        resultDisplay.innerHTML = `
+            <div class="rarity-title" style="color: ${rolledRarity.color};">${rolledRarity.name}</div>
+            <div class="rarity-chance">1 in ${rolledRarity.chance.toLocaleString()} chance | +${earnedPoints.toLocaleString()} Points</div>
+        `;
+
+        updateUI();
+    }
+
+    function canRoll() {
+        if (state.isAdmin) return true;
+        const elapsed = (Date.now() - state.lastRollTime) / 1000;
+        return elapsed >= getCooldownSeconds();
+    }
+
+    // --- Upgrade Logic ---
+
+    function buyUpgrade(type) {
+        const upg = state.upgrades[type];
+        const cost = getUpgradeCost(type);
+
+        if (state.points >= cost) {
+            state.points -= cost;
+            upg.level++;
+            updateUI();
+        }
+    }
+
+    function getUpgradeCost(type) {
+        const upg = state.upgrades[type];
+        return Math.floor(upg.baseCost * Math.pow(upg.costMult, upg.level));
+    }
+
+    // --- Admin Code Check ---
+
+    function checkAdmin() {
+        const input = document.getElementById('admin-code').value.trim();
+        if (input.toLowerCase() === 'admin') {
+            state.isAdmin = true;
+            document.getElementById('admin-badge').style.display = 'inline-block';
+            document.getElementById('admin-input-group').style.display = 'none';
+            updateUI();
+        } else {
+            alert('Invalid Secret Code!');
+        }
+    }
+
+    // --- UI & Timer Loop ---
+
+    function updateUI() {
+        // Stats
+        document.getElementById('points-display').innerText = Math.floor(state.points).toLocaleString();
+        document.getElementById('rolls-display').innerText = state.rolls.toLocaleString();
+        document.getElementById('luck-display').innerText = getLuckMultiplier().toFixed(2) + 'x';
+
+        // Upgrades UI
+        document.getElementById('luck-level-text').innerText = '+' + (state.upgrades.luck.level * 25) + '%';
+        document.getElementById('luck-cost').innerText = getUpgradeCost('luck').toLocaleString();
+        document.getElementById('buy-luck').disabled = state.points < getUpgradeCost('luck');
+
+        document.getElementById('points-level-text').innerText = getPointMultiplier().toFixed(1) + 'x';
+        document.getElementById('points-cost').innerText = getUpgradeCost('points').toLocaleString();
+        document.getElementById('buy-points').disabled = state.points < getUpgradeCost('points');
+
+        const cdSecs = getCooldownSeconds();
+        const cdMin = Math.floor(cdSecs / 60);
+        const cdRemSec = cdSecs % 60;
+        document.getElementById('cooldown-level-text').innerText = state.isAdmin ? '0s (Admin)' : `${cdMin}m ${cdRemSec < 10 ? '0' : ''}${cdRemSec}s`;
+        document.getElementById('cooldown-cost').innerText = getUpgradeCost('cooldown').toLocaleString();
+        document.getElementById('buy-cooldown').disabled = state.points < getUpgradeCost('cooldown');
+    }
+
+    function updateTimer() {
+        const rollBtn = document.getElementById('roll-btn');
+        const timerDisplay = document.getElementById('timer-display');
+
+        if (canRoll()) {
+            rollBtn.disabled = false;
+            timerDisplay.innerText = state.isAdmin ? "ADMIN MODE: Unlimited Rolls!" : "Ready to Roll!";
+            timerDisplay.style.color = "#55ff55";
+        } else {
+            rollBtn.disabled = true;
+            const remaining = getCooldownSeconds() - Math.floor((Date.now() - state.lastRollTime) / 1000);
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            timerDisplay.innerText = `Next Roll in: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            timerDisplay.style.color = "var(--subtext)";
+        }
+    }
+
+    // Run timer loop every 100ms
+    setInterval(updateTimer, 100);
+    
+    // Initial UI Sync
+    updateUI();
+</script>
+</body>
+</html>
