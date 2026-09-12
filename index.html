@@ -38,7 +38,7 @@
         /* Generator Area */
         .generator-card { background: var(--card-bg); border-radius: 16px; padding: 35px; text-align: center; border: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
         
-        /* Final Rarity Banner (Top) */
+        /* Final Rarity Banner */
         .final-banner { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 10px 15px; border-radius: 8px; width: 100%; text-align: center; min-height: 48px; }
         .tier-text-common { color: var(--color-common); text-shadow: 0 0 10px rgba(148,163,184,0.5); }
         .tier-text-rare { color: var(--color-rare); text-shadow: 0 0 10px rgba(59,130,246,0.5); }
@@ -46,7 +46,7 @@
         .tier-text-legendary { color: var(--color-legendary); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
         .tier-text-mythic { color: var(--color-mythic); text-shadow: 0 0 10px rgba(239,68,68,0.5); }
 
-        /* Dynamic Box Border based on Rarity */
+        /* Dynamic Box Border */
         .number-box { 
             font-family: 'Courier New', monospace; font-size: 4rem; font-weight: 900; letter-spacing: 10px; color: #ffffff; 
             background: #050608; padding: 20px 40px; border-radius: 12px; border: 2px solid var(--accent); 
@@ -69,7 +69,7 @@
         .roll-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; box-shadow: none; }
         .timer-text { font-size: 0.95rem; color: var(--subtext); }
 
-        /* Achievements Display Area */
+        /* Achievements */
         .achievements-container { width: 100%; max-width: 550px; display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
         .achievement-card { 
             background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; padding: 15px 20px; 
@@ -94,7 +94,7 @@
 
         @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* History Sidebar Panel */
+        /* History Sidebar */
         .history-panel { 
             width: 320px; background: var(--card-bg); border-radius: 16px; padding: 20px; 
             border: 1px solid var(--card-border); box-shadow: 0 8px 30px rgba(0,0,0,0.5); 
@@ -102,10 +102,7 @@
         }
         .history-header { font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .history-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 4px; }
-        .history-item { 
-            background: #0b0e14; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; 
-            display: flex; flex-direction: column; gap: 6px; position: relative;
-        }
+        .history-item { background: #0b0e14; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
         .history-top { display: flex; justify-content: space-between; align-items: center; }
         .history-num { font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; color: #fff; }
         .history-pts { font-size: 0.85rem; font-weight: bold; color: var(--gold); }
@@ -133,15 +130,10 @@
         </div>
 
         <div class="generator-card">
-            <!-- Rarity Banner at top -->
             <div class="final-banner" id="final-banner"></div>
-
             <div class="number-box" id="number-display">?</div>
-            
             <button class="roll-btn" id="btn-roll" onclick="startRollSequence()">Roll</button>
             <div class="timer-text" id="cooldown-display">Ready to roll!</div>
-
-            <!-- Achievements spawn here -->
             <div class="achievements-container" id="achievements-container"></div>
         </div>
 
@@ -154,7 +146,7 @@
         </div>
     </div>
 
-    <!-- Roll History Panel -->
+    <!-- History Panel -->
     <div class="history-panel">
         <div class="history-header">
             <span>Roll History</span>
@@ -168,11 +160,7 @@
     /* =====================================================================
        1. GAME STATE & SETTINGS
        ===================================================================== */
-    let GAME = {
-        pts: 0, rolls: 0, best: 0, cooldownReady: 0, isRolling: false, history: []
-    };
-
-    // 10 minutes per roll = 600,000 milliseconds
+    let GAME = { pts: 0, rolls: 0, best: 0, cooldownReady: 0, isRolling: false, history: [] };
     const baseCooldown = 10 * 60 * 1000; 
 
     if (localStorage.getItem('rngdleAchieveSaveClean')) {
@@ -182,232 +170,90 @@
     }
 
     /* =====================================================================
-       2. ACHIEVEMENT DEFINITIONS
+       2. HELPERS & DEFINITIONS
        ===================================================================== */
-    
     function highlightIndices(str, indicesArr) {
         return str.split('').map((char, i) => indicesArr.includes(i) ? `<span class="hl">${char}</span>` : char).join('');
     }
     function allIndices(len) { return Array.from({length: len}, (_, i) => i); }
+    function getSubstringIndices(s, sub) {
+        let idx = s.indexOf(sub);
+        return idx === -1 ? [] : Array.from({length: sub.length}, (_, i) => idx + i);
+    }
 
     const ACHIEVEMENTS = [
-        {
-            id: 'length7', name: '7 Digit Number', score: 150000, tier: 'mythic',
-            desc: "A colossal anomaly of length. (0.2% Base Chance)",
-            check: (s) => s.length === 7, getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'length6', name: '6 Digit Number', score: 15, tier: 'common',
-            desc: "The standard length for a roll. (50% Base Chance)",
-            check: (s) => s.length === 6, getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'length5', name: '5 Digit Number', score: 100, tier: 'uncommon',
-            desc: "Slightly truncated. (25% Base Chance)",
-            check: (s) => s.length === 5, getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'length4', name: '4 Digit Number', score: 250, tier: 'uncommon',
-            desc: "Four perfect digits. (15% Base Chance)",
-            check: (s) => s.length === 4, getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'length3', name: '3 Digit Number', score: 1000, tier: 'rare',
-            desc: "A compact trio. (7% Base Chance)",
-            check: (s) => s.length === 3, getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'length2', name: '2 Digit Number', score: 5000, tier: 'epic',
-            desc: "A tiny two-digit pair. (2% Base Chance)",
-            check: (s) => s.length === 2, getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'length1', name: '1 Digit Number', score: 25000, tier: 'legendary',
-            desc: "The purest form of a number. (0.8% Base Chance)",
-            check: (s) => s.length === 1, getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'even', name: 'Even Number', score: 10, tier: 'common',
-            desc: "Ends in 0, 2, 4, 6, or 8.",
-            check: (s) => parseInt(s[s.length-1]) % 2 === 0, 
-            getHtml: (s) => highlightIndices(s, [s.length-1])
-        },
-        {
-            id: 'odd', name: 'Odd Number', score: 10, tier: 'common',
-            desc: "Ends in 1, 3, 5, 7, or 9.",
-            check: (s) => parseInt(s[s.length-1]) % 2 !== 0, 
-            getHtml: (s) => highlightIndices(s, [s.length-1])
-        },
-        {
-            id: 'void', name: 'Void', score: 20, tier: 'common',
-            desc: "The number contains absolutely no zeros.",
-            check: (s) => !s.includes('0'), 
-            getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'neighbours', name: 'Neighbours', score: 25, tier: 'common',
-            desc: "Contains two adjacent digits next to each other in value.",
-            check: (s) => s.length >= 2 && s.split('').some((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1),
-            getHtml: (s) => {
-                let idx = s.split('').findIndex((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1);
-                return highlightIndices(s, [idx, idx+1]);
-            }
-        },
-        {
-            id: 'consecDoublePair', name: 'Consecutive Double Pair', score: 1200, tier: 'rare',
-            desc: "Two distinct pairs stacked right beside each other.",
-            check: (s) => /(.)\1(?!\1)(.)\2/.test(s),
-            getHtml: (s) => {
-                let match = s.match(/(.)\1(?!\1)(.)\2/);
-                return highlightIndices(s, [match.index, match.index+1, match.index+2, match.index+3]);
-            }
-        },
-        {
-            id: 'doublePair', name: 'Double Pair', score: 200, tier: 'uncommon',
-            desc: "Contains two sets of pairs scattered within the number.",
-            check: (s) => {
-                let counts = {};
-                for(let c of s) counts[c] = (counts[c]||0)+1;
-                return Object.values(counts).filter(v => v >= 2).length >= 2;
-            },
-            getHtml: (s) => {
-                let counts = {};
-                for(let c of s) counts[c] = (counts[c]||0)+1;
-                let pairs = Object.keys(counts).filter(k => counts[k] >= 2).slice(0, 2);
-                let indices = [];
-                s.split('').forEach((c, i) => { if(pairs.includes(c)) indices.push(i); });
-                return highlightIndices(s, indices);
-            }
-        },
-        {
-            id: 'consecPair', name: 'Consecutive Pair', score: 30, tier: 'common',
-            desc: "Two identical digits right next to each other.",
-            check: (s) => /(.)\1/.test(s),
-            getHtml: (s) => {
-                let match = s.match(/(.)\1/);
-                return highlightIndices(s, [match.index, match.index+1]);
-            }
-        },
-        {
-            id: 'pair', name: 'Pair', score: 15, tier: 'common',
-            desc: "Contains two of the exact same digit.",
-            check: (s) => new Set(s).size < s.length,
-            getHtml: (s) => {
-                let counts = {};
-                for(let c of s) counts[c] = (counts[c]||0)+1;
-                let pairChar = Object.keys(counts).find(k => counts[k] >= 2);
-                let indices = [];
-                s.split('').forEach((c, i) => { if(c === pairChar) indices.push(i); });
-                return highlightIndices(s, indices);
-            }
-        },
-        {
-            id: 'luckySevens', name: 'Lucky Sevens', score: 800, tier: 'rare',
-            desc: "Hit a consecutive pair of 7s.",
-            check: (s) => s.includes('77'),
-            getHtml: (s) => {
-                let idx = s.indexOf('77');
-                return highlightIndices(s, [idx, idx+1]);
-            }
-        },
-        {
-            id: 'sevens', name: "7's", score: 150, tier: 'uncommon',
-            desc: "Contains a pair of 7s anywhere in the string.",
-            check: (s) => (s.match(/7/g) || []).length >= 2,
-            getHtml: (s) => {
-                let indices = [];
-                s.split('').forEach((c, i) => { if(c === '7') indices.push(i); });
-                return highlightIndices(s, indices);
-            }
-        },
-        {
-            id: 'lowBall', name: 'Low Ball', score: 6000, tier: 'epic',
-            desc: "Every digit in the number is 4 or below.",
-            check: (s) => /^[0-4]+$/.test(s),
-            getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'highRoll', name: 'High Roll', score: 6000, tier: 'epic',
-            desc: "Every digit in the number is 5 or above.",
-            check: (s) => /^[5-9]+$/.test(s),
-            getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'heterogeneous', name: 'Heterogeneous', score: 180, tier: 'uncommon',
-            desc: "Every single digit is completely unique.",
-            check: (s) => new Set(s).size === s.length && s.length > 1,
-            getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'lucky7', name: 'Lucky 7', score: 150, tier: 'uncommon',
-            desc: "The entire number is cleanly divisible by 7.",
-            check: (s) => Number(s) % 7 === 0 && Number(s) > 0,
-            getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'runner', name: 'Runner', score: 1500, tier: 'rare',
-            desc: "Three or more digits are in perfect ascending order.",
-            check: (s) => s.length >= 3 && s.split('').some((c, i) => 
-                i < s.length-2 && parseInt(s[i+1]) === parseInt(c)+1 && parseInt(s[i+2]) === parseInt(c)+2
-            ),
-            getHtml: (s) => {
-                let idx = s.split('').findIndex((c, i) => i < s.length-2 && parseInt(s[i+1]) === parseInt(c)+1 && parseInt(s[i+2]) === parseInt(c)+2);
-                return highlightIndices(s, [idx, idx+1, idx+2]);
-            }
-        },
-        {
-            id: 'pocketMirror', name: 'Pocket Mirror', score: 1200, tier: 'rare',
-            desc: "Contains a mirrored palindrome inside the number.",
-            check: (s) => {
-                if(s.length < 3) return false;
-                for(let i=0; i<s.length-2; i++) {
-                    if (s[i] === s[i+2]) return true; 
-                    if (i<s.length-3 && s[i] === s[i+3] && s[i+1] === s[i+2]) return true;
-                }
-                return false;
-            },
-            getHtml: (s) => {
-                for(let i=0; i<s.length-3; i++) {
-                    if (s[i] === s[i+3] && s[i+1] === s[i+2]) return highlightIndices(s, [i, i+1, i+2, i+3]);
-                }
-                for(let i=0; i<s.length-2; i++) {
-                    if (s[i] === s[i+2]) return highlightIndices(s, [i, i+1, i+2]);
-                }
-                return s;
-            }
-        },
-        {
-            id: 'mirror', name: 'Mirror', score: 50000, tier: 'legendary',
-            desc: "The entire number reads the exact same backwards.",
-            check: (s) => s.length > 1 && s === s.split('').reverse().join(''),
-            getHtml: (s) => highlightIndices(s, allIndices(s.length))
-        },
-        {
-            id: 'translucent', name: 'Translucent', score: 7500, tier: 'epic',
-            desc: "The number starts and ends with a zero.",
-            check: (s) => s.length >= 2 && s.startsWith('0') && s.endsWith('0'),
-            getHtml: (s) => highlightIndices(s, [0, s.length-1])
-        },
-        {
-            id: 'century', name: 'Century', score: 1000, tier: 'rare',
-            desc: "The number ends with double zeros.",
-            check: (s) => s.length >= 2 && s.endsWith('00'),
-            getHtml: (s) => highlightIndices(s, [s.length-2, s.length-1])
+        // --- PREVIOUSLY IMPLEMENTED ---
+        { id: 'length7', name: '7 Digit Number', score: 150000, tier: 'mythic', desc: "A colossal anomaly of length. (0.2% Base Chance)", check: (s) => s.length === 7, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'length6', name: '6 Digit Number', score: 15, tier: 'common', desc: "The standard length for a roll.", check: (s) => s.length === 6, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'length5', name: '5 Digit Number', score: 100, tier: 'uncommon', desc: "Slightly truncated. (25% Base Chance)", check: (s) => s.length === 5, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'length4', name: '4 Digit Number', score: 250, tier: 'uncommon', desc: "Four perfect digits. (15% Base Chance)", check: (s) => s.length === 4, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'length3', name: '3 Digit Number', score: 1000, tier: 'rare', desc: "A compact trio. (7% Base Chance)", check: (s) => s.length === 3, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'length2', name: '2 Digit Number', score: 5000, tier: 'epic', desc: "A tiny two-digit pair. (2% Base Chance)", check: (s) => s.length === 2, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'length1', name: '1 Digit Number', score: 25000, tier: 'legendary', desc: "The purest form of a number. (0.8% Base Chance)", check: (s) => s.length === 1, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'even', name: 'Even Number', score: 10, tier: 'common', desc: "Ends in 0, 2, 4, 6, or 8.", check: (s) => parseInt(s[s.length-1]) % 2 === 0, getHtml: (s) => highlightIndices(s, [s.length-1]) },
+        { id: 'odd', name: 'Odd Number', score: 10, tier: 'common', desc: "Ends in 1, 3, 5, 7, or 9.", check: (s) => parseInt(s[s.length-1]) % 2 !== 0, getHtml: (s) => highlightIndices(s, [s.length-1]) },
+        { id: 'void', name: 'Void', score: 20, tier: 'common', desc: "The number contains absolutely no zeros.", check: (s) => !s.includes('0'), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'neighbours', name: 'Neighbours', score: 25, tier: 'common', desc: "Contains two adjacent digits next to each other in value.", check: (s) => s.length >= 2 && s.split('').some((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1), getHtml: (s) => highlightIndices(s, [s.split('').findIndex((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1), s.split('').findIndex((c, i) => i < s.length-1 && Math.abs(parseInt(c) - parseInt(s[i+1])) === 1)+1]) },
+        { id: 'consecDoublePair', name: 'Consecutive Double Pair', score: 1200, tier: 'rare', desc: "Two distinct pairs stacked right beside each other.", check: (s) => /(.)\1(?!\1)(.)\2/.test(s), getHtml: (s) => { let m = s.match(/(.)\1(?!\1)(.)\2/); return highlightIndices(s, [m.index, m.index+1, m.index+2, m.index+3]); } },
+        { id: 'doublePair', name: 'Double Pair', score: 200, tier: 'uncommon', desc: "Contains two sets of pairs scattered within the number.", check: (s) => { let counts = {}; for(let c of s) counts[c] = (counts[c]||0)+1; return Object.values(counts).filter(v => v >= 2).length >= 2; }, getHtml: (s) => { let counts = {}; for(let c of s) counts[c] = (counts[c]||0)+1; let pairs = Object.keys(counts).filter(k => counts[k] >= 2).slice(0, 2); let indices = []; s.split('').forEach((c, i) => { if(pairs.includes(c)) indices.push(i); }); return highlightIndices(s, indices); } },
+        { id: 'consecPair', name: 'Consecutive Pair', score: 30, tier: 'common', desc: "Two identical digits right next to each other.", check: (s) => /(.)\1/.test(s), getHtml: (s) => { let m = s.match(/(.)\1/); return highlightIndices(s, [m.index, m.index+1]); } },
+        { id: 'pair', name: 'Pair', score: 15, tier: 'common', desc: "Contains two of the exact same digit.", check: (s) => new Set(s).size < s.length, getHtml: (s) => { let counts = {}; for(let c of s) counts[c] = (counts[c]||0)+1; let pC = Object.keys(counts).find(k => counts[k] >= 2); let indices = []; s.split('').forEach((c, i) => { if(c === pC) indices.push(i); }); return highlightIndices(s, indices); } },
+        { id: 'luckySevens', name: 'Lucky Sevens', score: 800, tier: 'rare', desc: "Hit a consecutive pair of 7s.", check: (s) => s.includes('77'), getHtml: (s) => highlightIndices(s, [s.indexOf('77'), s.indexOf('77')+1]) },
+        { id: 'sevens', name: "7's", score: 150, tier: 'uncommon', desc: "Contains a pair of 7s anywhere in the string.", check: (s) => (s.match(/7/g) || []).length >= 2, getHtml: (s) => { let indices = []; s.split('').forEach((c, i) => { if(c === '7') indices.push(i); }); return highlightIndices(s, indices); } },
+        { id: 'lowBall', name: 'Low Ball', score: 6000, tier: 'epic', desc: "Every digit in the number is 4 or below.", check: (s) => /^[0-4]+$/.test(s), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'highRoll', name: 'High Roll', score: 6000, tier: 'epic', desc: "Every digit in the number is 5 or above.", check: (s) => /^[5-9]+$/.test(s), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'heterogeneous', name: 'Heterogeneous', score: 180, tier: 'uncommon', desc: "Every single digit is completely unique.", check: (s) => new Set(s).size === s.length && s.length > 1, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'lucky7', name: 'Lucky 7', score: 150, tier: 'uncommon', desc: "The entire number is cleanly divisible by 7.", check: (s) => Number(s) % 7 === 0 && Number(s) > 0, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'runner', name: 'Runner', score: 1500, tier: 'rare', desc: "Three or more digits are in perfect ascending order.", check: (s) => s.length >= 3 && s.split('').some((c, i) => i < s.length-2 && parseInt(s[i+1]) === parseInt(c)+1 && parseInt(s[i+2]) === parseInt(c)+2), getHtml: (s) => { let idx = s.split('').findIndex((c, i) => i < s.length-2 && parseInt(s[i+1]) === parseInt(c)+1 && parseInt(s[i+2]) === parseInt(c)+2); return highlightIndices(s, [idx, idx+1, idx+2]); } },
+        { id: 'pocketMirror', name: 'Pocket Mirror', score: 1200, tier: 'rare', desc: "Contains a mirrored palindrome inside the number.", check: (s) => { if(s.length < 3) return false; for(let i=0; i<s.length-2; i++) { if (s[i] === s[i+2]) return true; if (i<s.length-3 && s[i] === s[i+3] && s[i+1] === s[i+2]) return true; } return false; }, getHtml: (s) => { for(let i=0; i<s.length-3; i++) { if (s[i] === s[i+3] && s[i+1] === s[i+2]) return highlightIndices(s, [i, i+1, i+2, i+3]); } for(let i=0; i<s.length-2; i++) { if (s[i] === s[i+2]) return highlightIndices(s, [i, i+1, i+2]); } return s; } },
+        { id: 'mirror', name: 'Mirror', score: 50000, tier: 'legendary', desc: "The entire number reads the exact same backwards.", check: (s) => s.length > 1 && s === s.split('').reverse().join(''), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'translucent', name: 'Translucent', score: 7500, tier: 'epic', desc: "The number starts and ends with a zero.", check: (s) => s.length >= 2 && s.startsWith('0') && s.endsWith('0'), getHtml: (s) => highlightIndices(s, [0, s.length-1]) },
+        { id: 'century', name: 'Century', score: 1000, tier: 'rare', desc: "The number ends with double zeros.", check: (s) => s.length >= 2 && s.endsWith('00'), getHtml: (s) => highlightIndices(s, [s.length-2, s.length-1]) },
+
+        // --- NEW ACHIEVEMENTS ---
+        { id: 'div3', name: '3d', score: 500, tier: 'rare', desc: "Every digit in the number is divisible by 3.", check: (s) => /^[0369]+$/.test(s), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'div2', name: '2d', score: 500, tier: 'rare', desc: "Every digit in the number is even.", check: (s) => /^[02468]+$/.test(s), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'fifths', name: 'Fifths', score: 2000, tier: 'epic', desc: "Every digit in the number is divisible by 5.", check: (s) => /^[05]+$/.test(s), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'toaster', name: 'Toaster', score: 15000, tier: 'legendary', desc: "Number contains 7131 (Timi).", check: (s) => s.includes('7131'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '7131')) },
+        { id: '7ths', name: '7ths', score: 2000, tier: 'epic', desc: "Every digit in the number is either 7 or 0.", check: (s) => /^[07]+$/.test(s), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'binary', name: 'Binary', score: 2000, tier: 'epic', desc: "Every digit is 1 or 0.", check: (s) => /^[01]+$/.test(s), getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'counting10s', name: "Counting by 10's", score: 20, tier: 'common', desc: "The number is divisible by 10.", check: (s) => s.endsWith('0') && Number(s) > 0, getHtml: (s) => highlightIndices(s, [s.length-1]) },
+        { id: 'mountain', name: 'Mountain', score: 2500, tier: 'epic', desc: "Digits strictly ascend to a peak and then descend.", check: (s) => { if(s.length < 3) return false; let i = 0; while (i + 1 < s.length && s[i] < s[i+1]) i++; if (i === 0 || i === s.length - 1) return false; while (i + 1 < s.length && s[i] > s[i+1]) i++; return i === s.length - 1; }, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'valley', name: 'Valley', score: 2500, tier: 'epic', desc: "Digits strictly descend to a low and then ascend.", check: (s) => { if(s.length < 3) return false; let i = 0; while (i + 1 < s.length && s[i] > s[i+1]) i++; if (i === 0 || i === s.length - 1) return false; while (i + 1 < s.length && s[i] < s[i+1]) i++; return i === s.length - 1; }, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'alternator', name: 'Alternator', score: 1000, tier: 'rare', desc: "Digits alternate perfectly between odd and even.", check: (s) => { if (s.length < 3) return false; let isE = s[0] % 2 === 0; for(let i=1; i<s.length; i++) if ((s[i] % 2 === 0) !== (i % 2 === 0 ? isE : !isE)) return false; return true; }, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: '67', name: '67', score: 50, tier: 'uncommon', desc: "Number contains 67.", check: (s) => s.includes('67'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '67')) },
+        { id: 'nice', name: 'Nice', score: 69, tier: 'uncommon', desc: "Number contains 69.", check: (s) => s.includes('69'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '69')) },
+        { id: 'evenNicer', name: 'Even nicer', score: 690, tier: 'rare', desc: "The entire number is divisible by 69.", check: (s) => Number(s) % 69 === 0 && Number(s) > 0, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'counting', name: 'Counting', score: 300, tier: 'uncommon', desc: "Number contains 123.", check: (s) => s.includes('123'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '123')) },
+        { id: 'flying', name: 'Flying', score: 3000, tier: 'epic', desc: "Number contains 1234.", check: (s) => s.includes('1234'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '1234')) },
+        { id: 'skyrocketing', name: 'Skyrocketing', score: 25000, tier: 'legendary', desc: "Number contains 12345.", check: (s) => s.includes('12345'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '12345')) },
+        { id: 'error', name: 'ERROR', score: 404, tier: 'rare', desc: "Number contains 404.", check: (s) => s.includes('404'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '404')) },
+        { id: 'biteOfPie', name: 'Bite of pie', score: 314, tier: 'rare', desc: "Number contains 314.", check: (s) => s.includes('314'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '314')) },
+        { id: 'sliceAPie', name: 'Slice a pie', score: 3141, tier: 'epic', desc: "Number contains 3141.", check: (s) => s.includes('3141'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '3141')) },
+        { id: 'halfAPie', name: 'Half a pie', score: 15000, tier: 'legendary', desc: "Number contains 31415.", check: (s) => s.includes('31415'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '31415')) },
+        { id: 'pies', name: 'Pies', score: 150000, tier: 'mythic', desc: "Number contains 314159.", check: (s) => s.includes('314159'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '314159')) },
+        { id: 'golden', name: 'Golden', score: 500, tier: 'rare', desc: "Number contains 161.", check: (s) => s.includes('161'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '161')) },
+        { id: 'rootSquares', name: 'The root of all squares', score: 500, tier: 'rare', desc: "Number contains 141.", check: (s) => s.includes('141'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '141')) },
+        { id: 'rootCubes', name: 'The root of all cubes', score: 500, tier: 'rare', desc: "Number contains 173.", check: (s) => s.includes('173'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '173')) },
+        { id: 'likelyChance', name: 'Likely chance', score: 50, tier: 'uncommon', desc: "Number contains 37.", check: (s) => s.includes('37'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '37')) },
+        { id: 'unlikelyChance', name: 'Unlikely chance', score: 370, tier: 'rare', desc: "The entire number is divisible by 37.", check: (s) => Number(s) % 37 === 0 && Number(s) > 0, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'camel', name: 'Camel', score: 1500, tier: 'rare', desc: "Number strictly alternates between higher and lower digits.", check: (s) => { if (s.length < 3) return false; let diffs = []; for (let i=0; i<s.length-1; i++) { let d = s[i+1] - s[i]; if (d === 0) return false; diffs.push(d > 0); } for (let i=0; i<diffs.length-1; i++) { if (diffs[i] === diffs[i+1]) return false; } return true; }, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'duality', name: 'Duality', score: 800, tier: 'rare', desc: "The number contains exactly 2 different digits.", check: (s) => new Set(s).size === 2, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'triality', name: 'Triality', score: 150, tier: 'uncommon', desc: "The number contains exactly 3 different digits.", check: (s) => new Set(s).size === 3, getHtml: (s) => highlightIndices(s, allIndices(s.length)) },
+        { id: 'hatsune', name: 'Hatsune', score: 39, tier: 'uncommon', desc: "Number contains 39.", check: (s) => s.includes('39'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '39')) },
+        { id: 'kasane', name: 'Kasane', score: 4010, tier: 'epic', desc: "Number contains 0401.", check: (s) => s.includes('0401'), getHtml: (s) => highlightIndices(s, getSubstringIndices(s, '0401')) },
+        { id: 'insanity', name: 'Insanity', score: 1000, tier: 'rare', desc: "The number is exactly 1 away from flying (1234).", 
+          check: (s) => { let base = "1234"; for(let i=0; i<=s.length-4; i++) { let sub = s.substring(i, i+4); if (sub === base) continue; let diffCount = 0, isOffByOne = true; for(let j=0; j<4; j++) { if (sub[j] !== base[j]) { diffCount++; if (Math.abs(parseInt(sub[j]) - parseInt(base[j])) !== 1) isOffByOne = false; } } if (diffCount === 1 && isOffByOne) return true; } return false; }, 
+          getHtml: (s) => { let base = "1234", fIdx = -1; for(let i=0; i<=s.length-4; i++) { let sub = s.substring(i, i+4); if (sub === base) continue; let dC = 0, off1 = true; for(let j=0; j<4; j++) { if (sub[j] !== base[j]) { dC++; if (Math.abs(parseInt(sub[j]) - parseInt(base[j])) !== 1) off1 = false; } } if (dC === 1 && off1) { fIdx = i; break; } } return fIdx > -1 ? highlightIndices(s, [fIdx, fIdx+1, fIdx+2, fIdx+3]) : s; } 
         }
     ];
 
     /* =====================================================================
-       3. GENERATION LOGIC
+       3. GENERATION
        ===================================================================== */
-    
     function determineLength() {
-        let max = 1000;
-        let r = Math.random() * max;
-        
+        let r = Math.random() * 1000;
         let w = { l6: 500, l5: 250, l4: 150, l3: 70, l2: 20, l1: 8, l7: 2 };
-        let totalWeight = Object.values(w).reduce((a, b) => a + b, 0);
-        r = (r / max) * totalWeight;
-
         if (r < w.l6) return 6; r -= w.l6;
         if (r < w.l5) return 5; r -= w.l5;
         if (r < w.l4) return 4; r -= w.l4;
@@ -429,30 +275,23 @@
         
         document.getElementById("btn-roll").disabled = true;
         document.getElementById("btn-roll").innerText = "Rolling...";
-        
         document.getElementById("achievements-container").innerHTML = "";
         document.getElementById("final-banner").style.opacity = "0";
-        document.getElementById("number-display").className = "number-box"; // Reset box style during spin
+        document.getElementById("number-display").className = "number-box";
         
         let targetLen = determineLength();
         let targetStr = generateNumber(targetLen);
         
         let display = document.getElementById("number-display");
-        let cycles = 0;
-        let lockedStr = "";
+        let cycles = 0, lockedStr = "";
         
         let scrambleTimer = setInterval(() => {
             cycles++;
             let tempStr = lockedStr;
-            let remainingLen = targetLen - lockedStr.length;
-            
-            for(let i=0; i<remainingLen; i++) tempStr += Math.floor(Math.random() * 10);
+            for(let i=0; i<targetLen - lockedStr.length; i++) tempStr += Math.floor(Math.random() * 10);
             display.innerText = tempStr;
 
-            if (cycles % 4 === 0 && lockedStr.length < targetLen) {
-                lockedStr += targetStr[lockedStr.length];
-            }
-
+            if (cycles % 4 === 0 && lockedStr.length < targetLen) lockedStr += targetStr[lockedStr.length];
             if (lockedStr.length === targetLen) {
                 clearInterval(scrambleTimer);
                 display.innerText = targetStr;
@@ -462,9 +301,8 @@
     }
 
     /* =====================================================================
-       4. ACHIEVEMENT PROCESSING & DISPLAY
+       4. ACHIEVEMENT PROCESSING
        ===================================================================== */
-    
     function processNumber(numStr) {
         let earned = [];
         let matchedIds = [];
@@ -476,21 +314,29 @@
             }
         });
 
-        // Filter overlaps
-        if (matchedIds.includes("consecDoublePair")) earned = earned.filter(a => a.id !== "consecPair" && a.id !== "pair" && a.id !== "doublePair");
+        // Filter overlaps (Higher tier versions hiding lower tier versions)
+        if (matchedIds.includes("consecDoublePair")) earned = earned.filter(a => !["consecPair", "pair", "doublePair"].includes(a.id));
         else if (matchedIds.includes("doublePair")) earned = earned.filter(a => a.id !== "pair");
         else if (matchedIds.includes("consecPair")) earned = earned.filter(a => a.id !== "pair");
         
         if (matchedIds.includes("luckySevens")) earned = earned.filter(a => a.id !== "sevens");
         if (matchedIds.includes("mirror")) earned = earned.filter(a => a.id !== "pocketMirror");
 
+        if (matchedIds.includes("pies")) earned = earned.filter(a => !["halfAPie", "sliceAPie", "biteOfPie"].includes(a.id));
+        else if (matchedIds.includes("halfAPie")) earned = earned.filter(a => !["sliceAPie", "biteOfPie"].includes(a.id));
+        else if (matchedIds.includes("sliceAPie")) earned = earned.filter(a => a.id !== "biteOfPie");
+
+        if (matchedIds.includes("skyrocketing")) earned = earned.filter(a => !["flying", "counting"].includes(a.id));
+        else if (matchedIds.includes("flying")) earned = earned.filter(a => a.id !== "counting");
+
+        if (matchedIds.includes("counting10s")) earned = earned.filter(a => a.id !== "even");
+
         displayAchievementsSlowly(earned, numStr);
     }
 
     function displayAchievementsSlowly(earnedArr, numStr) {
         let container = document.getElementById("achievements-container");
-        let idx = 0;
-        let totalBaseScore = 0;
+        let idx = 0, totalBaseScore = 0;
 
         function showNext() {
             if (idx < earnedArr.length) {
@@ -511,14 +357,12 @@
                     <div class="ach-num-display">${ach.html}</div>
                 `;
                 container.appendChild(div);
-
                 idx++;
                 setTimeout(showNext, 600); 
             } else {
                 finalizeRoll(totalBaseScore, numStr);
             }
         }
-        
         setTimeout(showNext, 400);
     }
 
@@ -537,25 +381,13 @@
         else if (finalScore >= 1000) { rarityText = "RARE"; tierKey = "rare"; }
         else { rarityText = "COMMON"; tierKey = "common"; }
 
-        // Change banner text and color
         banner.innerText = `${rarityText} ROLL! (+${finalScore.toLocaleString()} pts)`;
         banner.className = `final-banner tier-text-${tierKey}`;
         banner.style.opacity = "1";
-
-        // Change the Number Box color to match Rarity
         box.className = `number-box box-${tierKey}`;
 
-        // Add to Roll History
         let timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        GAME.history.unshift({
-            number: numStr,
-            score: finalScore,
-            tier: tierKey,
-            rarityText: rarityText,
-            time: timeString
-        });
-
-        // Limit history memory to last 50 rolls
+        GAME.history.unshift({ number: numStr, score: finalScore, tier: tierKey, rarityText: rarityText, time: timeString });
         if (GAME.history.length > 50) GAME.history.pop();
 
         GAME.cooldownReady = Date.now() + baseCooldown;
@@ -568,22 +400,17 @@
     /* =====================================================================
        5. UI & HISTORY RENDER
        ===================================================================== */
-    
     function updateUI() {
         document.getElementById("ui-pts").innerText = GAME.pts.toLocaleString();
         document.getElementById("ui-rolls").innerText = GAME.rolls;
         document.getElementById("ui-best").innerText = GAME.best.toLocaleString();
-        
         renderHistory();
     }
 
     function renderHistory() {
         let listEl = document.getElementById("history-list");
-        let countEl = document.getElementById("history-count");
-        
-        countEl.innerText = `${GAME.history.length} roll${GAME.history.length === 1 ? '' : 's'}`;
+        document.getElementById("history-count").innerText = `${GAME.history.length} roll${GAME.history.length === 1 ? '' : 's'}`;
         listEl.innerHTML = "";
-
         GAME.history.forEach(item => {
             let div = document.createElement("div");
             div.className = "history-item";
@@ -601,11 +428,9 @@
         });
     }
 
-    /* Timer format mm:ss */
     setInterval(() => {
         let btn = document.getElementById("btn-roll");
         let txt = document.getElementById("cooldown-display");
-        
         if (GAME.isRolling) return; 
         
         let now = Date.now();
@@ -618,37 +443,23 @@
             let totalSecs = Math.ceil((GAME.cooldownReady - now) / 1000);
             let mins = Math.floor(totalSecs / 60);
             let secs = totalSecs % 60;
-            let formattedSecs = secs < 10 ? `0${secs}` : secs;
-            
-            btn.innerText = `WAIT (${mins}:${formattedSecs})`;
-            txt.innerText = `Next roll in ${mins}m ${formattedSecs}s`;
+            btn.innerText = `WAIT (${mins}:${secs < 10 ? '0'+secs : secs})`;
+            txt.innerText = `Next roll in ${mins}m ${secs < 10 ? '0'+secs : secs}s`;
         }
     }, 100);
 
     function saveGame() {
-        localStorage.setItem('rngdleAchieveSaveClean', JSON.stringify({
-            pts: GAME.pts, rolls: GAME.rolls, best: GAME.best, history: GAME.history, cooldownReady: GAME.cooldownReady
-        }));
+        localStorage.setItem('rngdleAchieveSaveClean', JSON.stringify({ pts: GAME.pts, rolls: GAME.rolls, best: GAME.best, history: GAME.history, cooldownReady: GAME.cooldownReady }));
     }
 
     function checkCode() {
         let code = document.getElementById("admin-code").value;
-        if (code === "motherlode") {
-            GAME.pts += 500000;
-            document.getElementById("admin-code").value = "";
-            updateUI();
-            saveGame();
-        } else if (code === "skip") {
-            GAME.cooldownReady = Date.now();
-            document.getElementById("admin-code").value = "";
-            saveGame();
-        } else if (code === "reset") {
-            localStorage.removeItem('rngdleAchieveSaveClean');
-            location.reload();
-        }
+        if (code === "motherlode") { GAME.pts += 500000; updateUI(); saveGame(); } 
+        else if (code === "skip") { GAME.cooldownReady = Date.now(); saveGame(); } 
+        else if (code === "reset") { localStorage.removeItem('rngdleAchieveSaveClean'); location.reload(); }
+        document.getElementById("admin-code").value = "";
     }
 
-    // Init
     updateUI();
 </script>
 
