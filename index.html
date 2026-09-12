@@ -15,11 +15,20 @@
             --text: #f8fafc;
             --subtext: #94a3b8;
             --hl-color: #38bdf8;
+            
+            /* Tier Colors */
+            --color-common: #94a3b8;
+            --color-rare: #3b82f6;
+            --color-epic: #a855f7;
+            --color-legendary: #f59e0b;
+            --color-mythic: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; }
-        body { background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { max-width: 950px; width: 100%; display: flex; flex-direction: column; gap: 25px; }
+        body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+        
+        .app-layout { display: flex; gap: 25px; max-width: 1250px; width: 100%; align-items: flex-start; }
+        .main-content { flex: 1; display: flex; flex-direction: column; gap: 25px; min-width: 0; }
 
         /* Stats Bar */
         .stats-bar { background: var(--card-bg); border-radius: 12px; padding: 20px; display: flex; justify-content: space-around; text-align: center; border: 1px solid var(--card-border); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
@@ -29,19 +38,27 @@
         /* Generator Area */
         .generator-card { background: var(--card-bg); border-radius: 16px; padding: 35px; text-align: center; border: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
         
-        /* Final Rarity Banner (Moved to Top) */
-        .final-banner { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 10px 15px; border-radius: 8px; width: 100%; text-align: center; margin-bottom: 5px; }
-        .tier-text-common { color: #94a3b8; text-shadow: 0 0 10px rgba(148,163,184,0.5); }
-        .tier-text-rare { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
-        .tier-text-epic { color: #a855f7; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
-        .tier-text-legendary { color: var(--gold); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
-        .tier-text-mythic { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        /* Final Rarity Banner (Top) */
+        .final-banner { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 10px 15px; border-radius: 8px; width: 100%; text-align: center; min-height: 48px; }
+        .tier-text-common { color: var(--color-common); text-shadow: 0 0 10px rgba(148,163,184,0.5); }
+        .tier-text-rare { color: var(--color-rare); text-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        .tier-text-epic { color: var(--color-epic); text-shadow: 0 0 10px rgba(168,85,247,0.5); }
+        .tier-text-legendary { color: var(--color-legendary); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+        .tier-text-mythic { color: var(--color-mythic); text-shadow: 0 0 10px rgba(239,68,68,0.5); }
 
+        /* Dynamic Box Border based on Rarity */
         .number-box { 
             font-family: 'Courier New', monospace; font-size: 4rem; font-weight: 900; letter-spacing: 10px; color: #ffffff; 
             background: #050608; padding: 20px 40px; border-radius: 12px; border: 2px solid var(--accent); 
             box-shadow: 0 0 20px var(--accent-glow); min-height: 110px; min-width: 350px; display: flex; justify-content: center; align-items: center; 
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
         }
+
+        .number-box.box-common { border-color: var(--color-common); box-shadow: 0 0 20px rgba(148, 163, 184, 0.4); }
+        .number-box.box-rare { border-color: var(--color-rare); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        .number-box.box-epic { border-color: var(--color-epic); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+        .number-box.box-legendary { border-color: var(--color-legendary); box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+        .number-box.box-mythic { border-color: var(--color-mythic); box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
 
         /* Highlighting Class */
         .hl { color: var(--hl-color); text-shadow: 0 0 12px var(--hl-color); font-weight: 900; }
@@ -60,12 +77,10 @@
             animation: slideIn 0.5s ease forwards; opacity: 0; transform: translateY(10px);
         }
         .ach-info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
-        
         .ach-header { display: flex; align-items: center; gap: 10px; }
         .ach-name { font-weight: bold; font-size: 1.15rem; color: #fff; }
         .ach-desc { font-size: 0.85rem; color: var(--subtext); font-style: italic; }
         .ach-score { font-size: 0.9rem; font-weight: bold; color: var(--gold); margin-top: 4px; }
-        
         .ach-num-display { font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: bold; letter-spacing: 4px; background: #000; padding: 8px 15px; border-radius: 6px; }
 
         /* Tier Badges */
@@ -79,60 +94,95 @@
 
         @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
 
+        /* History Sidebar Panel */
+        .history-panel { 
+            width: 320px; background: var(--card-bg); border-radius: 16px; padding: 20px; 
+            border: 1px solid var(--card-border); box-shadow: 0 8px 30px rgba(0,0,0,0.5); 
+            display: flex; flex-direction: column; gap: 15px; max-height: calc(100vh - 40px); position: sticky; top: 20px;
+        }
+        .history-header { font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .history-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 4px; }
+        .history-item { 
+            background: #0b0e14; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; 
+            display: flex; flex-direction: column; gap: 6px; position: relative;
+        }
+        .history-top { display: flex; justify-content: space-between; align-items: center; }
+        .history-num { font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; color: #fff; }
+        .history-pts { font-size: 0.85rem; font-weight: bold; color: var(--gold); }
+        .history-time { font-size: 0.75rem; color: var(--subtext); }
+
         /* Admin */
         .admin-card { background: var(--card-bg); border-radius: 12px; padding: 15px 20px; border: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
         .admin-card input { background: #0f131c; border: 1px solid var(--card-border); color: #fff; padding: 8px 12px; border-radius: 6px; outline: none; }
         .admin-card button { background: #334155; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+
+        @media (max-width: 900px) {
+            .app-layout { flex-direction: column; }
+            .history-panel { width: 100%; position: static; max-height: 400px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="stats-bar">
-        <div class="stat-box"><h3>Total Score</h3><p id="ui-pts">0</p></div>
-        <div class="stat-box"><h3>Total Rolls</h3><p id="ui-rolls">0</p></div>
-        <div class="stat-box"><h3>Best Roll</h3><p id="ui-best">0</p></div>
-    </div>
-
-    <div class="generator-card">
-        <!-- Rarity Banner moved to top -->
-        <div class="final-banner" id="final-banner"></div>
-
-        <div class="number-box" id="number-display">?</div>
-        
-        <button class="roll-btn" id="btn-roll" onclick="startRollSequence()">Roll</button>
-        <div class="timer-text" id="cooldown-display">Ready to roll!</div>
-
-        <!-- Achievements spawn here dynamically -->
-        <div class="achievements-container" id="achievements-container"></div>
-    </div>
-
-    <div class="admin-card">
-        <div><span style="color:#94a3b8; font-size: 0.9rem;">Admin Code:</span></div>
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="admin-code" placeholder="Enter code...">
-            <button onclick="checkCode()">Submit</button>
+<div class="app-layout">
+    <div class="main-content">
+        <div class="stats-bar">
+            <div class="stat-box"><h3>Total Score</h3><p id="ui-pts">0</p></div>
+            <div class="stat-box"><h3>Total Rolls</h3><p id="ui-rolls">0</p></div>
+            <div class="stat-box"><h3>Best Roll</h3><p id="ui-best">0</p></div>
         </div>
+
+        <div class="generator-card">
+            <!-- Rarity Banner at top -->
+            <div class="final-banner" id="final-banner"></div>
+
+            <div class="number-box" id="number-display">?</div>
+            
+            <button class="roll-btn" id="btn-roll" onclick="startRollSequence()">Roll</button>
+            <div class="timer-text" id="cooldown-display">Ready to roll!</div>
+
+            <!-- Achievements spawn here -->
+            <div class="achievements-container" id="achievements-container"></div>
+        </div>
+
+        <div class="admin-card">
+            <div><span style="color:#94a3b8; font-size: 0.9rem;">Admin Code:</span></div>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="admin-code" placeholder="Enter code...">
+                <button onclick="checkCode()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roll History Panel -->
+    <div class="history-panel">
+        <div class="history-header">
+            <span>Roll History</span>
+            <span id="history-count" style="font-size: 0.8rem; color: var(--subtext);">0 rolls</span>
+        </div>
+        <div class="history-list" id="history-list"></div>
     </div>
 </div>
 
 <script>
     /* =====================================================================
-       1. GAME STATE
+       1. GAME STATE & SETTINGS
        ===================================================================== */
     let GAME = {
-        pts: 0, rolls: 0, best: 0, cooldownReady: 0, isRolling: false,
+        pts: 0, rolls: 0, best: 0, cooldownReady: 0, isRolling: false, history: []
     };
 
-    let baseCooldown = 8000; 
+    // 10 minutes per roll = 600,000 milliseconds
+    const baseCooldown = 10 * 60 * 1000; 
 
     if (localStorage.getItem('rngdleAchieveSaveClean')) {
         let saved = JSON.parse(localStorage.getItem('rngdleAchieveSaveClean'));
         GAME = { ...GAME, ...saved };
+        if (!GAME.history) GAME.history = [];
     }
 
     /* =====================================================================
-       2. ACHIEVEMENT DEFINITIONS (Balanced Mathematically)
+       2. ACHIEVEMENT DEFINITIONS
        ===================================================================== */
     
     function highlightIndices(str, indicesArr) {
@@ -347,7 +397,7 @@
     ];
 
     /* =====================================================================
-       3. GENERATION LOGIC & ANIMATION
+       3. GENERATION LOGIC
        ===================================================================== */
     
     function determineLength() {
@@ -382,6 +432,7 @@
         
         document.getElementById("achievements-container").innerHTML = "";
         document.getElementById("final-banner").style.opacity = "0";
+        document.getElementById("number-display").className = "number-box"; // Reset box style during spin
         
         let targetLen = determineLength();
         let targetStr = generateNumber(targetLen);
@@ -464,48 +515,93 @@
                 idx++;
                 setTimeout(showNext, 600); 
             } else {
-                finalizeRoll(totalBaseScore);
+                finalizeRoll(totalBaseScore, numStr);
             }
         }
         
         setTimeout(showNext, 400);
     }
 
-    function finalizeRoll(finalScore) {
+    function finalizeRoll(finalScore, numStr) {
         GAME.pts += finalScore;
         GAME.rolls++;
         if (finalScore > GAME.best) GAME.best = finalScore;
 
-        updateUI();
-
         let banner = document.getElementById("final-banner");
-        let rarityText, tierClass;
+        let box = document.getElementById("number-display");
+        let rarityText, tierKey;
         
-        if (finalScore >= 150000) { rarityText = "MYTHIC"; tierClass = "tier-text-mythic"; }
-        else if (finalScore >= 25000) { rarityText = "LEGENDARY"; tierClass = "tier-text-legendary"; }
-        else if (finalScore >= 5000) { rarityText = "EPIC"; tierClass = "tier-text-epic"; }
-        else if (finalScore >= 1000) { rarityText = "RARE"; tierClass = "tier-text-rare"; }
-        else { rarityText = "COMMON"; tierClass = "tier-text-common"; }
+        if (finalScore >= 150000) { rarityText = "MYTHIC"; tierKey = "mythic"; }
+        else if (finalScore >= 25000) { rarityText = "LEGENDARY"; tierKey = "legendary"; }
+        else if (finalScore >= 5000) { rarityText = "EPIC"; tierKey = "epic"; }
+        else if (finalScore >= 1000) { rarityText = "RARE"; tierKey = "rare"; }
+        else { rarityText = "COMMON"; tierKey = "common"; }
 
+        // Change banner text and color
         banner.innerText = `${rarityText} ROLL! (+${finalScore.toLocaleString()} pts)`;
-        banner.className = `final-banner ${tierClass}`;
+        banner.className = `final-banner tier-text-${tierKey}`;
         banner.style.opacity = "1";
+
+        // Change the Number Box color to match Rarity
+        box.className = `number-box box-${tierKey}`;
+
+        // Add to Roll History
+        let timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        GAME.history.unshift({
+            number: numStr,
+            score: finalScore,
+            tier: tierKey,
+            rarityText: rarityText,
+            time: timeString
+        });
+
+        // Limit history memory to last 50 rolls
+        if (GAME.history.length > 50) GAME.history.pop();
 
         GAME.cooldownReady = Date.now() + baseCooldown;
         GAME.isRolling = false;
+        
+        updateUI();
         saveGame();
     }
 
     /* =====================================================================
-       5. UI & TIMERS
+       5. UI & HISTORY RENDER
        ===================================================================== */
     
     function updateUI() {
         document.getElementById("ui-pts").innerText = GAME.pts.toLocaleString();
         document.getElementById("ui-rolls").innerText = GAME.rolls;
         document.getElementById("ui-best").innerText = GAME.best.toLocaleString();
+        
+        renderHistory();
     }
 
+    function renderHistory() {
+        let listEl = document.getElementById("history-list");
+        let countEl = document.getElementById("history-count");
+        
+        countEl.innerText = `${GAME.history.length} roll${GAME.history.length === 1 ? '' : 's'}`;
+        listEl.innerHTML = "";
+
+        GAME.history.forEach(item => {
+            let div = document.createElement("div");
+            div.className = "history-item";
+            div.innerHTML = `
+                <div class="history-top">
+                    <span class="history-num">${item.number}</span>
+                    <span class="tier-badge badge-${item.tier}">${item.rarityText}</span>
+                </div>
+                <div class="history-top">
+                    <span class="history-pts">+${item.score.toLocaleString()} pts</span>
+                    <span class="history-time">${item.time}</span>
+                </div>
+            `;
+            listEl.appendChild(div);
+        });
+    }
+
+    /* Timer format mm:ss */
     setInterval(() => {
         let btn = document.getElementById("btn-roll");
         let txt = document.getElementById("cooldown-display");
@@ -519,15 +615,19 @@
             txt.innerText = "Ready to roll!";
         } else {
             btn.disabled = true;
-            let left = ((GAME.cooldownReady - now) / 1000).toFixed(1);
-            btn.innerText = `WAIT (${left}s)`;
-            txt.innerText = "Cooling down...";
+            let totalSecs = Math.ceil((GAME.cooldownReady - now) / 1000);
+            let mins = Math.floor(totalSecs / 60);
+            let secs = totalSecs % 60;
+            let formattedSecs = secs < 10 ? `0${secs}` : secs;
+            
+            btn.innerText = `WAIT (${mins}:${formattedSecs})`;
+            txt.innerText = `Next roll in ${mins}m ${formattedSecs}s`;
         }
     }, 100);
 
     function saveGame() {
         localStorage.setItem('rngdleAchieveSaveClean', JSON.stringify({
-            pts: GAME.pts, rolls: GAME.rolls, best: GAME.best
+            pts: GAME.pts, rolls: GAME.rolls, best: GAME.best, history: GAME.history, cooldownReady: GAME.cooldownReady
         }));
     }
 
@@ -537,6 +637,10 @@
             GAME.pts += 500000;
             document.getElementById("admin-code").value = "";
             updateUI();
+            saveGame();
+        } else if (code === "skip") {
+            GAME.cooldownReady = Date.now();
+            document.getElementById("admin-code").value = "";
             saveGame();
         } else if (code === "reset") {
             localStorage.removeItem('rngdleAchieveSaveClean');
