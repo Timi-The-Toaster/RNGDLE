@@ -14,7 +14,6 @@
             --gold: #f59e0b;
             --text: #f8fafc;
             --subtext: #94a3b8;
-            --locked: #334155;
             --hl-color: #38bdf8;
         }
 
@@ -30,6 +29,14 @@
         /* Generator Area */
         .generator-card { background: var(--card-bg); border-radius: 16px; padding: 35px; text-align: center; border: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
         
+        /* Final Rarity Banner (Moved to Top) */
+        .final-banner { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 10px 15px; border-radius: 8px; width: 100%; text-align: center; margin-bottom: 5px; }
+        .tier-text-common { color: #94a3b8; text-shadow: 0 0 10px rgba(148,163,184,0.5); }
+        .tier-text-rare { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        .tier-text-epic { color: #a855f7; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
+        .tier-text-legendary { color: var(--gold); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+        .tier-text-mythic { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+
         .number-box { 
             font-family: 'Courier New', monospace; font-size: 4rem; font-weight: 900; letter-spacing: 10px; color: #ffffff; 
             background: #050608; padding: 20px 40px; border-radius: 12px; border: 2px solid var(--accent); 
@@ -70,33 +77,7 @@
         .badge-legendary { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid #d97706; }
         .badge-mythic { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #dc2626; box-shadow: 0 0 10px rgba(239,68,68,0.4); }
 
-        /* Final Rarity Banner */
-        .final-banner { margin-top: 20px; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transition: opacity 0.5s ease; padding: 15px; border-radius: 8px; width: 100%; text-align: center; }
-        .tier-text-common { color: #94a3b8; text-shadow: 0 0 10px rgba(148,163,184,0.5); }
-        .tier-text-rare { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
-        .tier-text-epic { color: #a855f7; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
-        .tier-text-legendary { color: var(--gold); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
-        .tier-text-mythic { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
-
         @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
-
-        /* Upgrade Tree Structure */
-        .tree-section { background: var(--card-bg); border-radius: 16px; padding: 30px 20px; border: 1px solid var(--card-border); position: relative; }
-        .section-title { font-size: 1.4rem; color: #fff; text-align: center; margin-bottom: 25px; }
-        .tree-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 20px 0; width: 100%; }
-        .svg-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        .tree-tier { display: flex; justify-content: center; gap: 20px; width: 100%; z-index: 2; }
-        
-        .tree-node { 
-            background: #0f131c; border: 2px solid var(--locked); border-radius: 12px; padding: 15px; width: 180px; 
-            text-align: center; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;
-        }
-        .tree-node.unlocked { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-        .tree-node.bought { background: linear-gradient(145deg, #1c142b, #0f131c); border-color: var(--gold); box-shadow: 0 0 15px rgba(245,158,11,0.3); }
-        .tree-node.locked { opacity: 0.5; cursor: not-allowed; }
-        .node-title { font-size: 0.95rem; font-weight: bold; color: #fff; margin-bottom: 6px; }
-        .node-desc { font-size: 0.75rem; color: var(--subtext); margin-bottom: 10px; line-height: 1.2; }
-        .node-cost { font-size: 0.85rem; font-weight: bold; color: var(--gold); background: rgba(245,158,11,0.1); padding: 4px 8px; border-radius: 6px; }
 
         /* Admin */
         .admin-card { background: var(--card-bg); border-radius: 12px; padding: 15px 20px; border: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
@@ -114,6 +95,9 @@
     </div>
 
     <div class="generator-card">
+        <!-- Rarity Banner moved to top -->
+        <div class="final-banner" id="final-banner"></div>
+
         <div class="number-box" id="number-display">?</div>
         
         <button class="roll-btn" id="btn-roll" onclick="startRollSequence()">Roll</button>
@@ -121,18 +105,6 @@
 
         <!-- Achievements spawn here dynamically -->
         <div class="achievements-container" id="achievements-container"></div>
-        <div class="final-banner" id="final-banner"></div>
-    </div>
-
-    <div class="tree-section">
-        <div class="section-title">Upgrade Tree</div>
-        <div class="tree-container" id="tree-container">
-            <svg class="svg-lines" id="svg-lines"></svg>
-            <div class="tree-tier" id="tier-0"></div>
-            <div class="tree-tier" id="tier-1"></div>
-            <div class="tree-tier" id="tier-2"></div>
-            <div class="tree-tier" id="tier-3"></div>
-        </div>
     </div>
 
     <div class="admin-card">
@@ -149,13 +121,13 @@
        1. GAME STATE
        ===================================================================== */
     let GAME = {
-        pts: 0, rolls: 0, best: 0, upgrades: [], cooldownReady: 0, isRolling: false,
+        pts: 0, rolls: 0, best: 0, cooldownReady: 0, isRolling: false,
     };
 
     let baseCooldown = 8000; 
 
-    if (localStorage.getItem('rngdleAchieveSave')) {
-        let saved = JSON.parse(localStorage.getItem('rngdleAchieveSave'));
+    if (localStorage.getItem('rngdleAchieveSaveClean')) {
+        let saved = JSON.parse(localStorage.getItem('rngdleAchieveSaveClean'));
         GAME = { ...GAME, ...saved };
     }
 
@@ -167,14 +139,6 @@
         return str.split('').map((char, i) => indicesArr.includes(i) ? `<span class="hl">${char}</span>` : char).join('');
     }
     function allIndices(len) { return Array.from({length: len}, (_, i) => i); }
-
-    // Balanced Scoring Tiers:
-    // Common: 10 - 50 pts
-    // Uncommon: 100 - 300 pts
-    // Rare: 800 - 1500 pts
-    // Epic: 4000 - 8000 pts
-    // Legendary: 20000 - 50000 pts
-    // Mythic: 150000+ pts
 
     const ACHIEVEMENTS = [
         {
@@ -383,21 +347,7 @@
     ];
 
     /* =====================================================================
-       3. UPGRADE TREE
-       ===================================================================== */
-    const TREE = [
-        { id: "root", title: "Core Engine", desc: "+20% Base Points", cost: 0, req: [], tier: 0 },
-        { id: "luck1", title: "RNG Manipulator", desc: "Boost rare string lengths", cost: 250, req: ["root"], tier: 1 },
-        { id: "time1", title: "Clockwork I", desc: "-1.5s Cooldown", cost: 500, req: ["root"], tier: 1 },
-        { id: "pts1", title: "Score Multiplier", desc: "+50% Points", cost: 750, req: ["root"], tier: 1 },
-        { id: "luck2", title: "Anomaly", desc: "Huge boost to lengths 1 & 7", cost: 2500, req: ["luck1"], tier: 2 },
-        { id: "time2", title: "Clockwork II", desc: "-2s Cooldown", cost: 4000, req: ["time1"], tier: 2 },
-        { id: "pts2", title: "Combo Master", desc: "2x pts if base score > 1500", cost: 6000, req: ["pts1"], tier: 2 },
-        { id: "apex", title: "Apex System", desc: "-3s CD & +100% Points", cost: 25000, req: ["luck2", "time2", "pts2"], tier: 3 }
-    ];
-
-    /* =====================================================================
-       4. GENERATION LOGIC & ANIMATION
+       3. GENERATION LOGIC & ANIMATION
        ===================================================================== */
     
     function determineLength() {
@@ -405,9 +355,6 @@
         let r = Math.random() * max;
         
         let w = { l6: 500, l5: 250, l4: 150, l3: 70, l2: 20, l1: 8, l7: 2 };
-        if (GAME.upgrades.includes("luck1")) { w.l3 += 30; w.l2 += 30; w.l1 += 20; w.l7 += 8; }
-        if (GAME.upgrades.includes("luck2")) { w.l1 += 100; w.l7 += 40; w.l2 += 50; }
-
         let totalWeight = Object.values(w).reduce((a, b) => a + b, 0);
         r = (r / max) * totalWeight;
 
@@ -464,7 +411,7 @@
     }
 
     /* =====================================================================
-       5. ACHIEVEMENT PROCESSING & DISPLAY
+       4. ACHIEVEMENT PROCESSING & DISPLAY
        ===================================================================== */
     
     function processNumber(numStr) {
@@ -513,8 +460,6 @@
                     <div class="ach-num-display">${ach.html}</div>
                 `;
                 container.appendChild(div);
-                
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
                 idx++;
                 setTimeout(showNext, 600); 
@@ -526,17 +471,7 @@
         setTimeout(showNext, 400);
     }
 
-    function finalizeRoll(baseScore) {
-        let finalScore = baseScore;
-
-        let mult = 1;
-        if (GAME.upgrades.includes("root")) mult += 0.2;
-        if (GAME.upgrades.includes("pts1")) mult += 0.5;
-        if (GAME.upgrades.includes("apex")) mult += 1.0;
-        
-        finalScore = Math.floor(finalScore * mult);
-        if (GAME.upgrades.includes("pts2") && baseScore > 1500) finalScore *= 2;
-
+    function finalizeRoll(finalScore) {
         GAME.pts += finalScore;
         GAME.rolls++;
         if (finalScore > GAME.best) GAME.best = finalScore;
@@ -546,7 +481,6 @@
         let banner = document.getElementById("final-banner");
         let rarityText, tierClass;
         
-        // Final tier thresholds adjusted to match the new scoring system
         if (finalScore >= 150000) { rarityText = "MYTHIC"; tierClass = "tier-text-mythic"; }
         else if (finalScore >= 25000) { rarityText = "LEGENDARY"; tierClass = "tier-text-legendary"; }
         else if (finalScore >= 5000) { rarityText = "EPIC"; tierClass = "tier-text-epic"; }
@@ -557,25 +491,19 @@
         banner.className = `final-banner ${tierClass}`;
         banner.style.opacity = "1";
 
-        let cd = baseCooldown;
-        if (GAME.upgrades.includes("time1")) cd -= 1500;
-        if (GAME.upgrades.includes("time2")) cd -= 2000;
-        if (GAME.upgrades.includes("apex")) cd -= 3000;
-        
-        GAME.cooldownReady = Date.now() + cd;
+        GAME.cooldownReady = Date.now() + baseCooldown;
         GAME.isRolling = false;
         saveGame();
     }
 
     /* =====================================================================
-       6. UI & TIMERS
+       5. UI & TIMERS
        ===================================================================== */
     
     function updateUI() {
         document.getElementById("ui-pts").innerText = GAME.pts.toLocaleString();
         document.getElementById("ui-rolls").innerText = GAME.rolls;
         document.getElementById("ui-best").innerText = GAME.best.toLocaleString();
-        renderTree();
     }
 
     setInterval(() => {
@@ -597,106 +525,21 @@
         }
     }, 100);
 
-    /* =====================================================================
-       7. UPGRADE TREE RENDERING
-       ===================================================================== */
-    
-    function canBuy(node) {
-        if (GAME.upgrades.includes(node.id)) return false;
-        if (node.req.length === 0) return true;
-        return node.req.every(reqId => GAME.upgrades.includes(reqId));
-    }
-
-    function buyUpgrade(id) {
-        let node = TREE.find(n => n.id === id);
-        if (canBuy(node) && GAME.pts >= node.cost) {
-            GAME.pts -= node.cost;
-            GAME.upgrades.push(id);
-            updateUI();
-            saveGame();
-        }
-    }
-
-    function renderTree() {
-        [0, 1, 2, 3].forEach(tier => { document.getElementById(`tier-${tier}`).innerHTML = ""; });
-
-        TREE.forEach(node => {
-            let el = document.createElement("div");
-            let isBought = GAME.upgrades.includes(node.id);
-            let isUnlocked = canBuy(node);
-            
-            el.className = `tree-node ${isBought ? 'bought' : isUnlocked ? 'unlocked' : 'locked'}`;
-            el.id = `node-${node.id}`;
-            
-            el.innerHTML = `
-                <div class="node-title">${node.title}</div>
-                <div class="node-desc">${node.desc}</div>
-                <div class="node-cost">${isBought ? 'BOUGHT' : node.cost.toLocaleString() + ' pts'}</div>
-            `;
-            
-            if (isUnlocked && GAME.pts >= node.cost) {
-                el.onclick = () => buyUpgrade(node.id);
-            }
-
-            document.getElementById(`tier-${node.tier}`).appendChild(el);
-        });
-        
-        setTimeout(drawLines, 50); 
-    }
-
-    function drawLines() {
-        let svg = document.getElementById("svg-lines");
-        svg.innerHTML = "";
-        let containerRect = document.getElementById("tree-container").getBoundingClientRect();
-
-        TREE.forEach(node => {
-            node.req.forEach(reqId => {
-                let el1 = document.getElementById(`node-${reqId}`);
-                let el2 = document.getElementById(`node-${node.id}`);
-                
-                if (el1 && el2) {
-                    let r1 = el1.getBoundingClientRect();
-                    let r2 = el2.getBoundingClientRect();
-
-                    let x1 = r1.left + r1.width / 2 - containerRect.left;
-                    let y1 = r1.bottom - containerRect.top;
-                    let x2 = r2.left + r2.width / 2 - containerRect.left;
-                    let y2 = r2.top - containerRect.top;
-
-                    let isUnlocked = GAME.upgrades.includes(node.id) || canBuy(node);
-                    let color = isUnlocked ? "var(--accent)" : "var(--locked)";
-                    let width = isUnlocked ? 3 : 2;
-
-                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", x1);
-                    line.setAttribute("y1", y1);
-                    line.setAttribute("x2", x2);
-                    line.setAttribute("y2", y2);
-                    line.setAttribute("stroke", color);
-                    line.setAttribute("stroke-width", width);
-                    svg.appendChild(line);
-                }
-            });
-        });
-    }
-
-    window.addEventListener("resize", drawLines);
-
     function saveGame() {
-        localStorage.setItem('rngdleAchieveSave', JSON.stringify({
-            pts: GAME.pts, rolls: GAME.rolls, best: GAME.best, upgrades: GAME.upgrades
+        localStorage.setItem('rngdleAchieveSaveClean', JSON.stringify({
+            pts: GAME.pts, rolls: GAME.rolls, best: GAME.best
         }));
     }
 
     function checkCode() {
         let code = document.getElementById("admin-code").value;
         if (code === "motherlode") {
-            GAME.pts += 500000; // Increased to match new scaling
+            GAME.pts += 500000;
             document.getElementById("admin-code").value = "";
             updateUI();
             saveGame();
         } else if (code === "reset") {
-            localStorage.removeItem('rngdleAchieveSave');
+            localStorage.removeItem('rngdleAchieveSaveClean');
             location.reload();
         }
     }
